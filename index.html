@@ -51,10 +51,6 @@
 
       <!-- ------------------------------------------------------------------------
            [2-1. 상단 HUD (헤드업 디스플레이)]
-           - 수업 환경이나 프로젝터에서도 한눈에 상태가 보이도록 고대비 네온 스타일 적용
-           ------------------------------------------------------------------------ -->
-      <!-- ------------------------------------------------------------------------
-           [2-1. 상단 HUD (헤드업 디스플레이)]
            - 1학년 어린이들이 멀리서도 한눈에 알아볼 수 있는 큼직하고 알록달록한 네온 카드
            ------------------------------------------------------------------------ -->
       <header class="hud-top">
@@ -138,31 +134,153 @@
       </div>
 
       <!-- ------------------------------------------------------------------------
-           [2-3. 하단 빙하 & 살아 숨쉬는 북극곰 캐릭터 무대]
-           - 화면 하단 빙하 위에 서서 게임 성공률/빙하 체력에 따라 5가지로 반응하는 대형 북극곰!
+           [2-3. 하단 대형 빙하 월드 & 3배 커진 북극곰 히어로 & 펭귄 친구]
+           - 하단 왼쪽: 웅장한 대형 빙하 절벽 + 3배 커진 반응형 북극곰 히어로
+           - 하단 오른쪽: 대형 빙하 섬 + 귀여운 아기 펭귄 친구와 눈꽃 크리스탈 장식
            ------------------------------------------------------------------------ -->
-      <div id="bottomBearStage" class="bottom-bear-stage" aria-label="반응형 북극곰 캐릭터">
-        <!-- 북극곰 대화 말풍선 -->
-        <div id="polarBearSpeech" class="bear-speech-bubble">
-          <span id="bearSpeechText" class="speech-text">안녕 친구야! 내 얼음집을 지켜줘! ❄️</span>
-          <div class="bubble-arrow"></div>
+      <div id="glacierWorldContainer" class="glacier-world-container" aria-label="하단 북극 빙하 월드">
+
+        <!-- 🌟 [하단 왼쪽 대형 빙하 대륙 & 3배 커진 대형 북극곰] -->
+        <div id="bottomBearStage" class="glacier-stage glacier-stage-left" aria-label="좌측 대형 빙하와 3배 확대된 북극곰">
+          <!-- 북극곰 대화 말풍선 -->
+          <div id="polarBearSpeech" class="bear-speech-bubble">
+            <span id="bearSpeechText" class="speech-text">안녕 친구야! 내 얼음집을 지켜줘! ❄️</span>
+            <div class="bubble-arrow"></div>
+          </div>
+
+          <!-- 3배 대형 북극곰 메인 캐릭터 일러스트 (동작 및 감정 반응) -->
+          <div id="polarBearHero" class="polar-bear-hero mood-happy" title="빙하를 지키는 3배 커진 귀여운 북극곰 친구입니다!">
+            <div class="bear-character-wrapper">
+              <!-- 🌟 3배 커진 대형 북극곰 그래픽 (약 180~200px 크기) -->
+              <div id="bearAvatar" class="bear-avatar">🐻‍❄️</div>
+              <!-- 북극곰 주변을 맴도는 감정 이펙트 (하트, 반짝이, 땀방울 등) -->
+              <div id="bearMoodFx" class="bear-mood-fx">💖</div>
+            </div>
+            <!-- 북극곰이 딛고 서 있는 든든한 얼음 받침대 라벨 -->
+            <div class="bear-base-pedestal">
+              <span class="pedestal-ice">🧊</span>
+              <span id="bearMoodTitle" class="pedestal-title">행복한 북극곰</span>
+            </div>
+          </div>
+
+          <!-- 🏔️ 좌측 대형 입체 빙하 절벽 SVG 일러스트레이션 -->
+          <div class="glacier-cliff-graphic left-cliff" aria-hidden="true">
+            <svg viewBox="0 0 360 220" class="glacier-svg" preserveAspectRatio="none">
+              <defs>
+                <!-- 빙하 상단 만년설 화이트 그라데이션 -->
+                <linearGradient id="snowGradLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="60%" stop-color="#e2f6fd" />
+                  <stop offset="100%" stop-color="#b6ecfb" />
+                </linearGradient>
+                <!-- 빙하 몸체 에메랄드/사파이어 입체 그라데이션 -->
+                <linearGradient id="iceGradLeftBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.95" />
+                  <stop offset="40%" stop-color="#00a8cc" stop-opacity="0.9" />
+                  <stop offset="85%" stop-color="#0b3866" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="#051937" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 빙하 그늘진 면 어두운 크리스탈 그라데이션 -->
+                <linearGradient id="iceGradLeftShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#007799" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#041224" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 얼음 크리스탈 빛 반사 필터 -->
+                <filter id="iceGlowLeft" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="-2" stdDeviation="4" flood-color="#00f2fe" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+              <!-- 1. 빙하 뒷배경 얼음 융기봉 -->
+              <polygon points="10,220 50,70 120,40 180,95 240,65 310,120 350,220" fill="url(#iceGradLeftShadow)" opacity="0.75" />
+              <!-- 2. 빙하 메인 절벽 본체 -->
+              <polygon points="0,220 30,95 100,55 170,110 230,80 320,135 360,220" fill="url(#iceGradLeftBody)" filter="url(#iceGlowLeft)" />
+              <!-- 3. 빙하 입체 각진 면 (Facet 1, 2, 3) -->
+              <polygon points="100,55 170,110 135,220 60,220" fill="#00c0e8" opacity="0.45" />
+              <polygon points="170,110 230,80 250,220 180,220" fill="#007a9e" opacity="0.6" />
+              <polygon points="230,80 320,135 340,220 280,220" fill="#034870" opacity="0.5" />
+              <!-- 4. 빙하 윗면 눈 덮개 (북극곰이 서 있는 플랫폼) -->
+              <path d="M0,105 Q35,85 70,88 T140,75 T210,85 T280,105 T360,135 L360,165 Q290,140 210,120 T70,115 L0,130 Z" fill="url(#snowGradLeft)" />
+              <!-- 5. 얼음 크리스탈 하이라이트 라인 -->
+              <polyline points="30,95 100,55 170,110 230,80 320,135" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+              <polyline points="100,55 135,170" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+              <polyline points="230,80 250,180" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+            </svg>
+            <div class="glacier-shimmer-sparkle sp1">✨</div>
+            <div class="glacier-shimmer-sparkle sp2">❄️</div>
+          </div>
         </div>
 
-        <!-- 북극곰 메인 캐릭터 일러스트 (동작 및 감정 반응) -->
-        <div id="polarBearHero" class="polar-bear-hero mood-happy" title="빙하를 지키는 귀여운 북극곰 친구입니다!">
-          <div class="bear-character-wrapper">
-            <!-- 감정에 따라 깡충깡충 뛰거나 춤추는 대형 북극곰 그래픽 -->
-            <div id="bearAvatar" class="bear-avatar">🐻‍❄️</div>
-            <!-- 북극곰 주변을 맴도는 감정 이펙트 (하트, 반짝이, 땀방울 등) -->
-            <div id="bearMoodFx" class="bear-mood-fx">💖</div>
+        <!-- 🌟 [하단 오른쪽 대형 빙하 섬 & 귀여운 아기 펭귄 친구] -->
+        <div id="rightGlacierStage" class="glacier-stage glacier-stage-right" aria-label="우측 대형 빙하와 응원하는 펭귄 친구">
+          <!-- 펭귄 응원 말풍선 -->
+          <div class="bear-speech-bubble penguin-speech">
+            <span class="speech-text">힘내라 친구야! 펭귄도 응원해! 🐧❄️</span>
+            <div class="bubble-arrow"></div>
           </div>
-          <!-- 북극곰이 딛고 서 있는 든든한 얼음 받침대 라벨 -->
-          <div class="bear-base-pedestal">
-            <span class="pedestal-ice">🧊</span>
-            <span id="bearMoodTitle" class="pedestal-title">행복한 북극곰</span>
+
+          <!-- 아기 펭귄 캐릭터와 눈꽃 크리스탈 -->
+          <div class="penguin-friend-hero" title="북극곰과 함께 빙하를 지키는 펭귄 친구예요!">
+            <div class="penguin-character-wrapper">
+              <!-- 아기 펭귄 아바타 -->
+              <div class="penguin-avatar">🐧</div>
+              <!-- 펭귄 주변 반짝이 효과 -->
+              <div class="penguin-mood-fx">❄️</div>
+            </div>
+            <!-- 펭귄 얼음 받침대 라벨 -->
+            <div class="bear-base-pedestal penguin-pedestal">
+              <span class="pedestal-ice">💎</span>
+              <span class="pedestal-title">빙하 지킴이 펭귄</span>
+            </div>
+          </div>
+
+          <!-- 🏔️ 우측 대형 입체 빙하 절벽 SVG 일러스트레이션 -->
+          <div class="glacier-cliff-graphic right-cliff" aria-hidden="true">
+            <svg viewBox="0 0 340 210" class="glacier-svg" preserveAspectRatio="none">
+              <defs>
+                <!-- 우측 빙하 만년설 그라데이션 -->
+                <linearGradient id="snowGradRight" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="60%" stop-color="#e8f8fe" />
+                  <stop offset="100%" stop-color="#b8effe" />
+                </linearGradient>
+                <!-- 우측 빙하 청록 크리스탈 그라데이션 -->
+                <linearGradient id="iceGradRightBody" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.95" />
+                  <stop offset="45%" stop-color="#00b4d8" stop-opacity="0.9" />
+                  <stop offset="85%" stop-color="#0077b6" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="#032147" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 우측 빙하 그늘진 면 -->
+                <linearGradient id="iceGradRightShadow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#005f73" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#0a192f" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 빛 반사 필터 -->
+                <filter id="iceGlowRight" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="-2" stdDeviation="4" flood-color="#00f2fe" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+              <!-- 1. 뒷배경 얼음 융기봉 -->
+              <polygon points="0,210 40,110 110,65 190,90 270,50 330,100 340,210" fill="url(#iceGradRightShadow)" opacity="0.75" />
+              <!-- 2. 빙하 본체 -->
+              <polygon points="0,210 20,125 100,75 160,115 240,60 310,95 340,210" fill="url(#iceGradRightBody)" filter="url(#iceGlowRight)" />
+              <!-- 3. 빙하 입체 각진 면 (Facet) -->
+              <polygon points="240,60 160,115 190,210 270,210" fill="#00b4d8" opacity="0.5" />
+              <polygon points="160,115 100,75 80,210 140,210" fill="#0096c7" opacity="0.6" />
+              <polygon points="240,60 310,95 330,210 290,210" fill="#023e8a" opacity="0.55" />
+              <!-- 4. 윗면 눈 덮개 (펭귄이 딛고 서 있는 플랫폼) -->
+              <path d="M0,135 Q60,100 130,105 T220,80 T300,90 T340,115 L340,145 Q280,125 210,115 T100,125 L0,155 Z" fill="url(#snowGradRight)" />
+              <!-- 5. 하이라이트 엣지 라인 -->
+              <polyline points="20,125 100,75 160,115 240,60 310,95" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+              <polyline points="240,60 270,165" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+              <polyline points="100,75 80,170" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+            </svg>
+            <div class="glacier-shimmer-sparkle sp3">❄️</div>
+            <div class="glacier-shimmer-sparkle sp4">✨</div>
           </div>
         </div>
-      </div>
+
+      </div> <!-- end #glacierWorldContainer -->
 
       <!-- ------------------------------------------------------------------------
            [2-4. 하단 제어 툴바]
@@ -233,7 +351,7 @@
       </footer>
 
       <!-- ------------------------------------------------------------------------
-           [2-4. 시작 안내 / 조작법 도움말 카드 (초기 표시 또는 도움말 클릭 시 노출)]
+           [2-5. 시작 안내 / 조작법 도움말 카드 (초기 표시 또는 도움말 클릭 시 노출)]
            ------------------------------------------------------------------------ -->
       <div id="guideOverlay" class="guide-overlay">
         <div class="guide-card">
@@ -264,7 +382,7 @@
       </div>
 
       <!-- ------------------------------------------------------------------------
-           [2-5. 게임 결과 모달 (성적표: 지구 환경 수호자 인증서)]
+           [2-6. 게임 결과 모달 (성적표: 지구 환경 수호자 인증서)]
            - 게임 종료 시 나타나는 글래스모피즘 인증서 모달 창
            ------------------------------------------------------------------------ -->
       <div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">

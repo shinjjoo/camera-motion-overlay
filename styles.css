@@ -586,20 +586,22 @@ html, body {
    [9. 하단 제어 툴바]
    -------------------------------------------------------------------------- */
 .toolbar-bottom {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1440px;
+  justify-content: center;
+  gap: 1.2rem;
+  width: auto;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 0.65rem 1.4rem;
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
-  border-radius: 24px;
+  border-radius: 28px;
   box-shadow: var(--glass-shadow);
+  z-index: 40;
 }
 
 .control-group {
@@ -1178,17 +1180,27 @@ html, body {
     padding: 0.85rem 1.5rem;
   }
 
-  .bottom-bear-stage {
-    bottom: 6.5rem;
+  .glacier-stage-left {
+    bottom: 5.5rem;
+    left: 2rem;
+  }
+
+  .glacier-stage-right {
+    bottom: 5.5rem;
+    right: 2rem;
   }
 
   .bear-avatar {
-    font-size: 5rem;
+    font-size: 14rem;
+  }
+
+  .penguin-avatar {
+    font-size: 7rem;
   }
 }
 
 /* ==========================================================================
-   [13. 초등학교 1학년 맞춤형 컴포넌트: 레벨 배지 & 하단 북극곰 캐릭터 무대]
+   [13. 초등학교 1학년 맞춤형 컴포넌트: 레벨 배지 & 하단 대형 빙하 월드]
    ========================================================================== */
 
 /* 13-1. 상단 HUD: 5단계 레벨 배지 카드 */
@@ -1237,65 +1249,128 @@ html, body {
   box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
 }
 
-/* 13-3. 하단 빙하 & 살아 숨쉬는 북극곰 캐릭터 무대 (.bottom-bear-stage) */
-.bottom-bear-stage {
+/* --------------------------------------------------------------------------
+   [13-3. 하단 대형 빙하 월드 전체 컨테이너 (.glacier-world-container)]
+   - 화면 하단 좌우에 대칭으로 위치하는 웅장한 빙하 섬들을 감싸는 레이어
+   -------------------------------------------------------------------------- */
+.glacier-world-container {
   position: absolute;
-  bottom: 5.5rem;
-  left: 2.5rem; /* 화면 좌하단 빙하 위에 예쁘게 배치 */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
   z-index: 25;
+}
+
+/* 좌/우 빙하 무대 공통 기본 스타일 */
+.glacier-stage {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   pointer-events: auto;
   cursor: pointer;
+  user-select: none;
   transition: transform var(--duration-normal) var(--ease-smooth);
 }
 
-.bottom-bear-stage:hover {
-  transform: scale(1.05);
+/* 좌측 대형 빙하 무대: 3배 대형 북극곰이 서 있는 장소 */
+.glacier-stage-left {
+  bottom: 4.8rem;
+  left: 1.5rem;
+  animation: glacier-bob-left 4.8s ease-in-out infinite;
 }
 
-/* 북극곰 대화 말풍선 */
+.glacier-stage-left:hover {
+  transform: scale(1.03) translateY(-4px);
+}
+
+/* 우측 대형 빙하 무대: 귀여운 아기 펭귄 친구가 서 있는 장소 */
+.glacier-stage-right {
+  bottom: 4.8rem;
+  right: 1.5rem;
+  animation: glacier-bob-right 5.2s ease-in-out infinite;
+}
+
+.glacier-stage-right:hover {
+  transform: scale(1.03) translateY(-4px);
+}
+
+/* 북극 바다 위에 빙하가 둥실둥실 출렁이는 부유 모션 */
+@keyframes glacier-bob-left {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes glacier-bob-right {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(-1deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   [13-4. 대화 말풍선 공통 스타일 (.bear-speech-bubble)]
+   - 초등학교 1학년이 교실 뒤에서도 뚜렷하게 읽을 수 있는 큼직하고 둥글둥글한 디자인
+   -------------------------------------------------------------------------- */
 .bear-speech-bubble {
   position: relative;
   background: #ffffff;
-  color: #0b203c;
-  padding: 0.6rem 1.1rem;
-  border-radius: 20px;
+  color: #081a33;
+  padding: 0.75rem 1.3rem;
+  border-radius: 24px;
   font-family: var(--font-base);
-  font-size: 0.85rem;
-  font-weight: 700;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(0, 242, 254, 0.5);
-  margin-bottom: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(0, 242, 254, 0.55);
+  margin-bottom: 0.8rem;
   white-space: nowrap;
-  animation: speech-bounce 2.5s infinite ease-in-out;
-  border: 2px solid var(--ice-cyan);
+  animation: speech-bounce 2.6s infinite ease-in-out;
+  border: 3px solid var(--ice-cyan);
+  z-index: 10;
+}
+
+.penguin-speech {
+  border-color: #ffd700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(255, 215, 0, 0.5);
+  animation: speech-bounce 3s infinite ease-in-out;
+  font-size: 0.95rem;
 }
 
 .bubble-arrow {
   position: absolute;
-  bottom: -8px;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid #ffffff;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #ffffff;
 }
 
 @keyframes speech-bounce {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-5px); }
 }
 
-/* 북극곰 메인 히어로 캐릭터 박스 */
+/* --------------------------------------------------------------------------
+   [13-5. 🌟 3배 커진 대형 북극곰 메인 히어로]
+   -------------------------------------------------------------------------- */
 .polar-bear-hero {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
+  z-index: 5;
 }
 
 .bear-character-wrapper {
@@ -1305,53 +1380,187 @@ html, body {
   justify-content: center;
 }
 
-/* 대형 북극곰 아바타 */
+/* 🌟 북극곰 아바타 크기: 기존 3.8rem의 정확히 3배인 11.5rem (약 184px)! */
 .bear-avatar {
-  font-size: 3.8rem;
+  font-size: 11.5rem;
   line-height: 1;
   user-select: none;
   transition: transform 0.3s var(--ease-bounce);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
 }
 
-/* 북극곰 주변 맴도는 감정 이펙트 (하트, 눈물, 별가루 등) */
+/* 북극곰 주변을 맴도는 대형 감정 이펙트 (하트, 눈물, 별가루 등) */
 .bear-mood-fx {
   position: absolute;
-  top: -8px;
-  right: -12px;
-  font-size: 1.5rem;
+  top: -15px;
+  right: -25px;
+  font-size: 3.2rem;
   animation: mood-fx-pop 1.8s infinite ease-in-out;
 }
 
 @keyframes mood-fx-pop {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
-  50% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.95; }
+  50% { transform: scale(1.35) rotate(18deg); opacity: 1; }
 }
 
-/* 북극곰이 서 있는 받침대 라벨 */
+/* 북극곰이 서 있는 든든한 받침대 라벨 */
 .bear-base-pedestal {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.2rem;
-  background: rgba(10, 25, 47, 0.85);
-  border: 1px solid var(--ice-cyan);
+  gap: 0.4rem;
+  margin-top: -0.5rem;
+  background: rgba(10, 25, 47, 0.9);
+  border: 1.5px solid var(--ice-cyan);
   border-radius: 9999px;
-  padding: 0.2rem 0.65rem;
-  box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+  padding: 0.35rem 0.9rem;
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.5);
+  z-index: 6;
 }
 
 .pedestal-ice {
-  font-size: 0.85rem;
+  font-size: 1.15rem;
 }
 
 .pedestal-title {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.88rem;
+  font-weight: 800;
   color: var(--ice-cyan);
+  letter-spacing: 0.02em;
 }
 
 /* --------------------------------------------------------------------------
-   [13-4. 북극곰 5대 감정/상태별 애니메이션 키프레임]
+   [13-6. 🐧 우측 대형 빙하의 아기 펭귄 친구]
+   -------------------------------------------------------------------------- */
+.penguin-friend-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+  z-index: 5;
+}
+
+.penguin-character-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 펭귄 아바타 크기 */
+.penguin-avatar {
+  font-size: 5.5rem;
+  line-height: 1;
+  user-select: none;
+  animation: penguin-waddle 2.2s infinite ease-in-out;
+}
+
+/* 펭귄 뒤뚱뒤뚱 귀여운 응원 모션 */
+@keyframes penguin-waddle {
+  0%, 100% {
+    transform: rotate(-6deg) translateY(0);
+  }
+  50% {
+    transform: rotate(6deg) translateY(-8px);
+  }
+}
+
+.penguin-mood-fx {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  font-size: 2rem;
+  animation: sparkle-twinkle 1.6s infinite ease-in-out;
+}
+
+.penguin-pedestal {
+  border-color: #ffd700;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.45);
+}
+
+.penguin-pedestal .pedestal-title {
+  color: #ffe600;
+}
+
+/* --------------------------------------------------------------------------
+   [13-7. 🏔️ 웅장한 입체 대형 빙하 절벽 그래픽 (.glacier-cliff-graphic)]
+   -------------------------------------------------------------------------- */
+.glacier-cliff-graphic {
+  position: absolute;
+  bottom: -4rem; /* 북극곰과 펭귄의 발 아래로 시원하게 펼쳐지는 절벽 */
+  width: 380px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.6));
+}
+
+.glacier-cliff-graphic.left-cliff {
+  left: -20px;
+}
+
+.glacier-cliff-graphic.right-cliff {
+  right: -20px;
+  width: 350px;
+  height: 210px;
+}
+
+.glacier-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 빙하 표면에서 반짝거리는 크리스탈 별가루 & 눈꽃 */
+.glacier-shimmer-sparkle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  animation: sparkle-twinkle 2.5s infinite ease-in-out;
+}
+
+.glacier-shimmer-sparkle.sp1 {
+  top: 45px;
+  left: 80px;
+  font-size: 1.4rem;
+  animation-delay: 0.2s;
+}
+
+.glacier-shimmer-sparkle.sp2 {
+  top: 75px;
+  right: 60px;
+  font-size: 1.2rem;
+  animation-delay: 0.8s;
+}
+
+.glacier-shimmer-sparkle.sp3 {
+  top: 50px;
+  left: 60px;
+  font-size: 1.3rem;
+  animation-delay: 0.4s;
+}
+
+.glacier-shimmer-sparkle.sp4 {
+  top: 70px;
+  right: 70px;
+  font-size: 1.4rem;
+  animation-delay: 1.1s;
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3) rotate(20deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.9));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   [13-8. 북극곰 5대 감정/상태별 애니메이션 키프레임]
    1. 초신남 (Dancing Bear): 양손 흔들며 깡충깡충 뜀
    2. 응원 (Cheering Bear): 부드럽게 좌우로 흔들리며 파이팅
    3. 당황/깜짝 (Worried Bear): 땀 흘리며 덜덜 떨림
@@ -1361,62 +1570,110 @@ html, body {
 
 /* 1. 초신남 댄싱 모드 */
 .polar-bear-hero.mood-dancing .bear-avatar {
-  animation: bear-dance 0.7s infinite alternate ease-in-out;
+  animation: bear-dance 0.75s infinite alternate ease-in-out;
 }
 
 @keyframes bear-dance {
-  0% { transform: translateY(0) rotate(-8deg) scale(1.05); }
-  50% { transform: translateY(-16px) rotate(0deg) scale(1.15); }
-  100% { transform: translateY(0) rotate(8deg) scale(1.05); }
+  0% { transform: translateY(0) rotate(-10deg) scale(1.03); }
+  50% { transform: translateY(-24px) rotate(0deg) scale(1.12); }
+  100% { transform: translateY(0) rotate(10deg) scale(1.03); }
 }
 
 /* 2. 평상시 응원 모드 */
 .polar-bear-hero.mood-cheering .bear-avatar {
-  animation: bear-cheer 1.4s infinite ease-in-out;
+  animation: bear-cheer 1.5s infinite ease-in-out;
 }
 
 @keyframes bear-cheer {
   0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-8px) scale(1.06); }
+  50% { transform: translateY(-12px) scale(1.05); }
 }
 
 /* 3. 당황/깜짝 모드 (온실가스가 빙하에 닿았을 때) */
 .polar-bear-hero.mood-worried .bear-avatar {
-  animation: bear-worry 0.3s infinite ease-in-out;
+  animation: bear-worry 0.28s infinite ease-in-out;
 }
 
 @keyframes bear-worry {
-  0%, 100% { transform: translateX(-3px) rotate(-3deg); }
-  50% { transform: translateX(3px) rotate(3deg); }
+  0%, 100% { transform: translateX(-5px) rotate(-4deg); }
+  50% { transform: translateX(5px) rotate(4deg); }
 }
 
 /* 4. 위기/울음 모드 (체력 30% 이하) */
 .polar-bear-hero.mood-crying .bear-avatar {
-  animation: bear-cry 0.9s infinite ease-in-out;
+  animation: bear-cry 0.95s infinite ease-in-out;
 }
 
 @keyframes bear-cry {
-  0%, 100% { transform: scale(0.95) translateY(2px); }
-  50% { transform: scale(0.9) translateY(6px); }
+  0%, 100% { transform: scale(0.96) translateY(3px); }
+  50% { transform: scale(0.92) translateY(10px); }
 }
 
 /* 5. 승리/슈퍼히어로 모드 */
 .polar-bear-hero.mood-superhero .bear-avatar {
-  animation: bear-superhero 0.8s infinite alternate ease-in-out;
-  filter: drop-shadow(0 0 16px #ffd700);
+  animation: bear-superhero 0.85s infinite alternate ease-in-out;
+  filter: drop-shadow(0 0 24px #ffd700);
 }
 
 @keyframes bear-superhero {
-  0% { transform: translateY(0) scale(1.1); }
-  100% { transform: translateY(-20px) scale(1.25); }
+  0% { transform: translateY(0) scale(1.08); }
+  100% { transform: translateY(-30px) scale(1.22); }
 }
 
-/* 모바일 및 작은 화면 반응형 대응 */
-@media (max-width: 768px) {
-  .bottom-bear-stage {
-    bottom: 8.5rem;
-    left: 1rem;
+/* --------------------------------------------------------------------------
+   [13-9. 반응형 미디어 쿼리 (태블릿, 노트북, 모바일 최적화)]
+   -------------------------------------------------------------------------- */
+/* 일반 노트북 및 중간 해상도 화면 (1280px 이하) */
+@media (max-width: 1280px) {
+  .glacier-stage-left {
     transform: scale(0.85);
+    transform-origin: bottom left;
+    left: 0.5rem;
+    bottom: 4.8rem;
+  }
+
+  .glacier-stage-right {
+    transform: scale(0.85);
+    transform-origin: bottom right;
+    right: 0.5rem;
+    bottom: 4.8rem;
   }
 }
+
+/* 태블릿 및 아이패드 화면 (1024px 이하) */
+@media (max-width: 1024px) {
+  .glacier-stage-left {
+    transform: scale(0.72);
+    transform-origin: bottom left;
+    left: 0.2rem;
+    bottom: 5.2rem;
+  }
+
+  .glacier-stage-right {
+    transform: scale(0.72);
+    transform-origin: bottom right;
+    right: 0.2rem;
+    bottom: 5.2rem;
+  }
+}
+
+/* 모바일 및 스마트폰 세로 화면 (768px 이하) */
+@media (max-width: 768px) {
+  .glacier-stage-left {
+    transform: scale(0.55);
+    transform-origin: bottom left;
+    left: 0;
+    bottom: 7.5rem;
+  }
+
+  .glacier-stage-right {
+    display: none; /* 스마트폰 화면에서는 툴바 공간 확보를 위해 우측 펭귄 숨김 */
+  }
+
+  .bear-speech-bubble {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.9rem;
+  }
+}
+
 
