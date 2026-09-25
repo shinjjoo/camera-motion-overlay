@@ -53,6 +53,10 @@
            [2-1. 상단 HUD (헤드업 디스플레이)]
            - 수업 환경이나 프로젝터에서도 한눈에 상태가 보이도록 고대비 네온 스타일 적용
            ------------------------------------------------------------------------ -->
+      <!-- ------------------------------------------------------------------------
+           [2-1. 상단 HUD (헤드업 디스플레이)]
+           - 1학년 어린이들이 멀리서도 한눈에 알아볼 수 있는 큼직하고 알록달록한 네온 카드
+           ------------------------------------------------------------------------ -->
       <header class="hud-top">
         <!-- 타이틀 및 로고 영역 -->
         <div class="brand-group">
@@ -61,18 +65,30 @@
           </div>
           <div class="brand-text">
             <h1 class="brand-title">북극 빙하 지킴이</h1>
-            <span class="brand-badge">ARCTIC GUARDIAN</span>
+            <span class="brand-badge">초등 1학년 모험</span>
           </div>
         </div>
 
-        <!-- 중앙: 북극곰과 빙하 체력(Health) 게이지 -->
-        <div class="hud-card glacier-status-container" title="빙하의 남은 체력입니다. 온실가스를 막아 북극곰의 터전을 지켜주세요!">
+        <!-- 🌟 5단계 난이도 레벨 표시 배지 카드 -->
+        <div id="levelCard" class="hud-card metric-card level-card" title="현재 도전 중인 난이도 단계입니다.">
+          <div class="metric-icon">⭐</div>
+          <div class="metric-data">
+            <span class="metric-label">도전 단계</span>
+            <div class="level-value-box">
+              <span id="levelDisplay" class="digital-number level-number">1단계</span>
+              <span id="levelSubTitle" class="unit-text level-name">새싹 수호자 🐣</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 중앙: 빙하 건강도(Health) 게이지 -->
+        <div class="hud-card glacier-status-container" title="빙하의 건강 상태예요. 온실가스를 막아 북극곰의 얼음집을 지켜주세요!">
           <div class="glacier-icon-box">
-            <span id="bearStatusIcon" class="bear-icon" aria-label="북극곰">🐻‍❄️</span>
+            <span id="bearStatusIcon" class="bear-icon" aria-label="북극곰 미니 아이콘">🐻‍❄️</span>
           </div>
           <div class="glacier-gauge-info">
             <div class="glacier-gauge-header">
-              <span class="gauge-label">빙하 보존율</span>
+              <span class="gauge-label">얼음집 튼튼도</span>
               <span id="glacierHealthText" class="gauge-value">100%</span>
             </div>
             <!-- 실제 게이지 트랙과 채움 바 -->
@@ -84,10 +100,10 @@
           </div>
         </div>
 
-        <!-- 우측: 남은 시간 타이머 및 탄소 감축 점수판 -->
+        <!-- 우측: 남은 시간 타이머 및 나쁜 가스 잡은 양(점수) 카드 -->
         <div class="metrics-group">
           <!-- 남은 시간 타이머 카드 -->
-          <div class="hud-card metric-card timer-card" title="제한 시간">
+          <div class="hud-card metric-card timer-card" title="남은 시간 동안 얼음집을 지켜주세요!">
             <div class="metric-icon">⏳</div>
             <div class="metric-data">
               <span class="metric-label">남은 시간</span>
@@ -98,11 +114,11 @@
             </div>
           </div>
 
-          <!-- 탄소 감축 점수 카드 -->
-          <div class="hud-card metric-card score-card" title="지금까지 줄인 이산화탄소 양입니다.">
+          <!-- 나쁜 가스 잡은 점수 카드 -->
+          <div class="hud-card metric-card score-card" title="지금까지 터뜨려 정화한 나쁜 가스의 양이에요.">
             <div class="metric-icon">🌱</div>
             <div class="metric-data">
-              <span class="metric-label">탄소 감축량</span>
+              <span class="metric-label">잡은 가스</span>
               <div class="score-value-box">
                 <span id="carbonScore" class="digital-number">0</span>
                 <span class="unit-text">kg</span>
@@ -113,8 +129,8 @@
       </header>
 
       <!-- ------------------------------------------------------------------------
-           [2-2. 중앙 알림 토스트 (메시지 배너)]
-           - '좋아요! 탄소 감축 성공', '주의: 빙하가 급격히 녹고 있습니다' 등 피드백 표시
+           [2-2. 중앙 알림 토스트 (칭찬 및 피드백 배너)]
+           - 1학년 어린이들에게 칭찬과 활력을 불어넣는 큼직한 메시지 배너
            ------------------------------------------------------------------------ -->
       <div id="notificationBanner" class="notification-banner hidden" role="alert">
         <span id="notificationIcon" class="notification-icon">✨</span>
@@ -122,13 +138,52 @@
       </div>
 
       <!-- ------------------------------------------------------------------------
-           [2-3. 하단 제어 툴바]
-           - 카메라 선택, 거울 모드, OBS 투명 모드, 크로마키, 전체화면, 게임 시작 버튼
+           [2-3. 하단 빙하 & 살아 숨쉬는 북극곰 캐릭터 무대]
+           - 화면 하단 빙하 위에 서서 게임 성공률/빙하 체력에 따라 5가지로 반응하는 대형 북극곰!
+           ------------------------------------------------------------------------ -->
+      <div id="bottomBearStage" class="bottom-bear-stage" aria-label="반응형 북극곰 캐릭터">
+        <!-- 북극곰 대화 말풍선 -->
+        <div id="polarBearSpeech" class="bear-speech-bubble">
+          <span id="bearSpeechText" class="speech-text">안녕 친구야! 내 얼음집을 지켜줘! ❄️</span>
+          <div class="bubble-arrow"></div>
+        </div>
+
+        <!-- 북극곰 메인 캐릭터 일러스트 (동작 및 감정 반응) -->
+        <div id="polarBearHero" class="polar-bear-hero mood-happy" title="빙하를 지키는 귀여운 북극곰 친구입니다!">
+          <div class="bear-character-wrapper">
+            <!-- 감정에 따라 깡충깡충 뛰거나 춤추는 대형 북극곰 그래픽 -->
+            <div id="bearAvatar" class="bear-avatar">🐻‍❄️</div>
+            <!-- 북극곰 주변을 맴도는 감정 이펙트 (하트, 반짝이, 땀방울 등) -->
+            <div id="bearMoodFx" class="bear-mood-fx">💖</div>
+          </div>
+          <!-- 북극곰이 딛고 서 있는 든든한 얼음 받침대 라벨 -->
+          <div class="bear-base-pedestal">
+            <span class="pedestal-ice">🧊</span>
+            <span id="bearMoodTitle" class="pedestal-title">행복한 북극곰</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------------------
+           [2-4. 하단 제어 툴바]
+           - 5단계 난이도 선택, 카메라 선택, 거울 모드, 방송 모드, 게임 시작 버튼
            ------------------------------------------------------------------------ -->
       <footer class="toolbar-bottom">
-        <!-- 좌측: 카메라 선택 드롭다운 -->
+        <!-- 좌측: 난이도 단계 선택 및 카메라 선택 드롭다운 -->
         <div class="control-group camera-select-group">
-          <label for="cameraSelect" class="sr-only">카메라 선택</label>
+          <!-- 🌟 5단계 난이도 선택 드롭다운 -->
+          <div class="select-wrapper level-select-wrapper" title="게임 난이도를 1단계부터 5단계까지 선택할 수 있습니다.">
+            <span class="select-icon">🎯</span>
+            <select id="levelSelect" class="styled-select level-select" aria-label="게임 난이도 단계 선택">
+              <option value="1" selected>⭐ 1단계: 새싹 수호자 (아주 쉬움)</option>
+              <option value="2">⭐⭐ 2단계: 초보 수호자 (쉬움)</option>
+              <option value="3">⭐⭐⭐ 3단계: 빙하 친구 (보통)</option>
+              <option value="4">⭐⭐⭐⭐ 4단계: 북극 지킴이 (어려움)</option>
+              <option value="5">⭐⭐⭐⭐⭐ 5단계: 지구 영웅 (스릴 만점!)</option>
+            </select>
+          </div>
+
+          <!-- 카메라 장치 선택 드롭다운 -->
           <div class="select-wrapper">
             <span class="select-icon">📷</span>
             <select id="cameraSelect" class="styled-select" aria-label="입력 웹캠 선택">
@@ -148,7 +203,7 @@
           <!-- OBS Studio 투명 브라우저 소스 모드 토글 버튼 -->
           <button id="toggleObsBtn" class="btn btn-tool" type="button" title="OBS Studio 송출을 위해 웹캠 배경을 투명하게 만듭니다.">
             <span class="btn-icon">🎬</span>
-            <span class="btn-text">OBS 투명 모드</span>
+            <span class="btn-text">OBS 투명</span>
           </button>
 
           <!-- 크로마키(그린스크린) 모드 토글 버튼 -->
@@ -160,7 +215,7 @@
           <!-- 사운드 On/Off 토글 버튼 -->
           <button id="toggleSoundBtn" class="btn btn-tool" type="button" title="효과음 및 배경 음악 켜기/끄기">
             <span id="soundIcon" class="btn-icon">🔊</span>
-            <span id="soundText" class="btn-text">사운드 ON</span>
+            <span id="soundText" class="btn-text">소리 켬</span>
           </button>
 
           <!-- 전체화면 토글 버튼 -->
@@ -172,7 +227,7 @@
           <!-- 메인 게임 시작 / 일시정지 / 재도전 버튼 -->
           <button id="gameStartBtn" class="btn btn-primary" type="button" title="게임을 시작합니다.">
             <span class="btn-icon">🚀</span>
-            <span id="gameStartText" class="btn-text">게임 시작</span>
+            <span id="gameStartText" class="btn-text">게임 시작!</span>
           </button>
         </div>
       </footer>

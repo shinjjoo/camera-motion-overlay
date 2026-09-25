@@ -384,6 +384,16 @@ export class ArcticGuardianApp {
       });
     }
 
+    // 🌟 5단계 난이도 레벨 선택기 (#levelSelect)
+    const levelSelect = document.getElementById('levelSelect');
+    if (levelSelect) {
+      levelSelect.addEventListener('change', (e) => {
+        if (this.gameEngine) {
+          this.gameEngine.setLevel(e.target.value);
+        }
+      });
+    }
+
     // --------------------------------------------------------------------------
     // 7. 시작 도움말 닫기 버튼 (#guideCloseBtn)
     // --------------------------------------------------------------------------
@@ -686,6 +696,33 @@ export class ArcticGuardianApp {
       case 'KeyF': // F: 전체화면 토글
         e.preventDefault();
         this.toggleFullscreen();
+        break;
+
+      // 🌟 숫자키 1 ~ 5: 5단계 난이도 즉시 변경 (교육자 원클릭 단축키)
+      case 'Digit1':
+      case 'Numpad1':
+        e.preventDefault();
+        if (this.gameEngine) this.gameEngine.setLevel(1);
+        break;
+      case 'Digit2':
+      case 'Numpad2':
+        e.preventDefault();
+        if (this.gameEngine) this.gameEngine.setLevel(2);
+        break;
+      case 'Digit3':
+      case 'Numpad3':
+        e.preventDefault();
+        if (this.gameEngine) this.gameEngine.setLevel(3);
+        break;
+      case 'Digit4':
+      case 'Numpad4':
+        e.preventDefault();
+        if (this.gameEngine) this.gameEngine.setLevel(4);
+        break;
+      case 'Digit5':
+      case 'Numpad5':
+        e.preventDefault();
+        if (this.gameEngine) this.gameEngine.setLevel(5);
         break;
 
       case 'Escape': // ESC: 도움말이나 결과 모달 닫기

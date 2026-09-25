@@ -30,72 +30,161 @@ export const GAME_STATE = {
 };
 
 /**
+ * 🌟 [초등학교 1학년 맞춤형 5단계 레벨 시스템 설정]
+ * - 1단계(새싹): 매우 느린 속도, 넓은 스폰 간격, 순한 CO2 중심 (방울이 왕 커서 터뜨리기 쉬움)
+ * - 2단계(초보): 눈꽃 회복 방울이 자주 등장
+ * - 3단계(친구): 초록색 메탄가스(CH4) 등장
+ * - 4단계(지킴이): 조심해야 할 유독 매연 폭탄(BOMB) 등장
+ * - 5단계(영웅): 빠른 속도로 쏟아지는 스릴 만점 최고 난이도 폭포수
+ */
+export const LEVEL_CONFIGS = {
+  1: {
+    level: 1,
+    name: '새싹 수호자 🐣',
+    desc: '아주 천천히 내려와요! 손을 뻗어 팡팡 터뜨려봐요.',
+    speedMultiplier: 0.65,    // 속도 매우 느림 (0.65배)
+    spawnInterval: 2200,      // 2.2초마다 1개 생성
+    maxBubbles: 4,            // 화면에 최대 4개만 유지
+    co2Weight: 80,
+    ch4Weight: 0,
+    iceWeight: 20,
+    bombWeight: 0,            // 1단계에는 폭탄 없음 (안전!)
+    bubbleScale: 1.25         // 1단계에서는 방울 크기가 1.25배 더 왕 커짐!
+  },
+  2: {
+    level: 2,
+    name: '초보 수호자 🌿',
+    desc: '얼음을 회복해주는 눈꽃 방울도 함께 나와요!',
+    speedMultiplier: 0.85,    // 속도 느림
+    spawnInterval: 1800,      // 1.8초마다 1개 생성
+    maxBubbles: 5,
+    co2Weight: 70,
+    ch4Weight: 10,
+    iceWeight: 20,
+    bombWeight: 0,            // 2단계도 폭탄 없음
+    bubbleScale: 1.15
+  },
+  3: {
+    level: 3,
+    name: '빙하 친구 🧊',
+    desc: '초록색 메탄가스가 나와요! 양손으로 터뜨려요.',
+    speedMultiplier: 1.05,    // 보통 속도
+    spawnInterval: 1400,      // 1.4초마다 1개 생성
+    maxBubbles: 7,
+    co2Weight: 50,
+    ch4Weight: 25,
+    iceWeight: 20,
+    bombWeight: 5,            // 폭탄 살짝 등장
+    bubbleScale: 1.05
+  },
+  4: {
+    level: 4,
+    name: '북극 지킴이 🛡️',
+    desc: '검붉은 폭탄은 피하고 가스만 쏙쏙 잡아요!',
+    speedMultiplier: 1.35,    // 약간 빠름
+    spawnInterval: 1100,      // 1.1초마다 1~2개 생성
+    maxBubbles: 9,
+    co2Weight: 40,
+    ch4Weight: 35,
+    iceWeight: 15,
+    bombWeight: 10,
+    bubbleScale: 1.0
+  },
+  5: {
+    level: 5,
+    name: '지구 영웅 👑',
+    desc: '쏟아지는 가스를 온몸으로 막아내는 최종 모험!',
+    speedMultiplier: 1.7,     // 스릴 만점 빠른 속도
+    spawnInterval: 800,       // 0.8초마다 빠르게 생성
+    maxBubbles: 12,
+    co2Weight: 35,
+    ch4Weight: 40,
+    iceWeight: 12,
+    bombWeight: 13,
+    bubbleScale: 0.95
+  }
+};
+
+/**
  * 하늘에서 떨어지는 방울(오브젝트) 4가지 유형 상수 정의
+ * - 초등학교 1학년이 1~2m 떨어진 웹캠 앞에서도 바로 읽을 수 있도록 반경(radius)을 2배 대폭 확대!
  */
 export const BUBBLE_TYPES = {
   CO2: {
     type: 'CO2',
     name: '이산화탄소',
+    icon: '☁️',
     label: 'CO₂',
     subLabel: '+10kg',
-    radius: 36,
-    score: 10,           // 터뜨렸을 때 얻는 탄소 감축량 (+10kg)
-    damage: 5,           // 바닥 빙하에 닿았을 때 빙하 손상도 (-5%)
+    kidName: '나쁜 가스',
+    kidDesc: '+10 점수',
+    radius: 62,              // 기존 36 -> 62px로 대폭 확대! (지름 124px)
+    score: 10,               // 터뜨렸을 때 얻는 탄소 감축량 (+10kg)
+    damage: 5,               // 바닥 빙하에 닿았을 때 빙하 손상도 (-5%)
     heal: 0,
-    baseColor: 'rgba(120, 140, 165, 0.85)',
-    borderColor: '#94a3b8',
-    glowColor: 'rgba(148, 163, 184, 0.6)',
-    speedMin: 1.8,
-    speedMax: 2.8,
-    spawnWeight: 45      // 스폰 확률 가중치 (45%)
+    baseColor: 'rgba(100, 125, 155, 0.92)',
+    borderColor: '#b4c6dc',
+    glowColor: 'rgba(180, 205, 235, 0.8)',
+    speedMin: 1.4,
+    speedMax: 2.2,
+    spawnWeight: 45
   },
   CH4: {
     type: 'CH4',
     name: '메탄가스',
+    icon: '🫧',
     label: 'CH₄',
     subLabel: '+25kg',
-    radius: 38,
-    score: 25,           // 터뜨렸을 때 얻는 탄소 감축량 (+25kg)
-    damage: 7,           // 바닥 빙하에 닿았을 때 빙하 손상도 (-7%)
+    kidName: '초록 가스',
+    kidDesc: '+25 고득점!',
+    radius: 66,              // 기존 38 -> 66px로 대폭 확대! (지름 132px)
+    score: 25,               // 터뜨렸을 때 얻는 탄소 감축량 (+25kg)
+    damage: 7,               // 바닥 빙하에 닿았을 때 빙하 손상도 (-7%)
     heal: 0,
-    baseColor: 'rgba(34, 197, 94, 0.85)',
+    baseColor: 'rgba(22, 175, 85, 0.92)',
     borderColor: '#4ade80',
-    glowColor: 'rgba(74, 222, 128, 0.65)',
-    speedMin: 2.2,
-    speedMax: 3.4,
-    spawnWeight: 25      // 스폰 확률 가중치 (25%)
+    glowColor: 'rgba(74, 222, 128, 0.85)',
+    speedMin: 1.7,
+    speedMax: 2.7,
+    spawnWeight: 25
   },
   ICE: {
     type: 'ICE',
     name: '눈꽃 결정',
+    icon: '❄️',
     label: '❄️',
     subLabel: '+15%',
-    radius: 34,
+    kidName: '얼음 보석',
+    kidDesc: '빙하 +15% 회복!',
+    radius: 60,              // 기존 34 -> 60px로 대폭 확대! (지름 120px)
     score: 0,
     damage: 0,
-    heal: 15,            // 손끝으로 터치 시 빙하 체력 회복 (+15%)
-    baseColor: 'rgba(0, 242, 254, 0.85)',
-    borderColor: '#38bdf8',
-    glowColor: 'rgba(0, 242, 254, 0.8)',
-    speedMin: 1.5,
-    speedMax: 2.4,
-    spawnWeight: 18      // 스폰 확률 가중치 (18%)
+    heal: 15,                // 손끝으로 터치 시 빙하 체력 회복 (+15%)
+    baseColor: 'rgba(0, 220, 240, 0.92)',
+    borderColor: '#7dd3fc',
+    glowColor: 'rgba(56, 189, 248, 0.9)',
+    speedMin: 1.2,
+    speedMax: 2.0,
+    spawnWeight: 18
   },
   BOMB: {
     type: 'BOMB',
     name: '유독 매연 폭탄',
+    icon: '☠️',
     label: '☠️',
     subLabel: '-25% 위험!',
-    radius: 40,
+    kidName: '위험 폭탄!',
+    kidDesc: '만지면 안 돼요!',
+    radius: 68,              // 기존 40 -> 68px로 대폭 확대! (지름 136px)
     score: 0,
-    damage: 25,          // 건드리면 즉시 폭발하여 빙하 체력 대폭 감소 (-25%)
+    damage: 25,              // 건드리면 즉시 폭발하여 빙하 체력 대폭 감소 (-25%)
     heal: 0,
-    baseColor: 'rgba(239, 68, 68, 0.85)',
+    baseColor: 'rgba(235, 45, 75, 0.92)',
     borderColor: '#f87171',
-    glowColor: 'rgba(239, 68, 68, 0.85)',
-    speedMin: 2.0,
-    speedMax: 3.2,
-    spawnWeight: 12      // 스폰 확률 가중치 (12%)
+    glowColor: 'rgba(248, 113, 113, 0.95)',
+    speedMin: 1.6,
+    speedMax: 2.6,
+    spawnWeight: 12
   }
 };
 
@@ -131,6 +220,7 @@ export class GameEngine {
     this.onStateChange = options.onStateChange || null;
     this.onScoreUpdate = options.onScoreUpdate || null;
     this.onPostRender = options.onPostRender || null;
+    this.onBearMoodChange = options.onBearMoodChange || null;
 
     // 4. 거울 모드 감지용 타깃 컨테이너
     this.appContainer = document.getElementById('appContainer');
@@ -145,6 +235,14 @@ export class GameEngine {
     this.glacierHealth = 100;     // 빙하 보존율 (100% 시작, 0%가 되면 게임 오버)
     this.carbonScore = 0;         // 총 탄소 감축량 (kg CO2)
 
+    // 🌟 5단계 난이도 레벨 관리 변수 (초등 1학년 맞춤형: 기본 1단계 새싹 수호자)
+    this.currentLevel = options.initialLevel || 1;
+
+    // 🌟 반응형 북극곰 캐릭터 상태 변수
+    this.bearMood = 'cheering';   // 'dancing', 'cheering', 'worried', 'crying', 'superhero'
+    this.consecutiveHits = 0;     // 연속 터뜨리기 콤보 카운트
+    this.lastHitTime = 0;         // 마지막 히트 시각
+
     // 카운트다운 타이머 변수
     this.countdownSeconds = 3;
     this.countdownTimerId = null;
@@ -155,9 +253,10 @@ export class GameEngine {
     this.floatingTexts = [];      // 화면 위로 스르륵 떠오르는 점수 텍스트 (+10kg, +15% 등)
     this.glacierMeltEffects = []; // 빙하에 온실가스가 닿을 때 피어오르는 수증기 파티클
 
-    // 8. 스폰 제어 타이머
+    // 8. 스폰 제어 타이머 (현재 레벨의 스폰 간격으로 초기화)
     this.spawnTimer = 0;
-    this.spawnInterval = 1100;    // 초기 스폰 간격 (밀리초 단위, 시간이 갈수록 점진적 단축)
+    const initialLevelConfig = LEVEL_CONFIGS[this.currentLevel] || LEVEL_CONFIGS[1];
+    this.spawnInterval = initialLevelConfig.spawnInterval;
     this.lastFrameTime = performance.now();
 
     // 9. 손동작 인식 손끝 좌표 버퍼
@@ -190,7 +289,74 @@ export class GameEngine {
     if (this.autoLoop) {
       this.animationFrameId = requestAnimationFrame(this._gameLoop);
     }
-    console.log(`🧊 [게임 엔진] GameEngine 준비 완료! (내부 루프: ${this.autoLoop ? '활성' : '수동 제어'})`);
+    console.log(`🧊 [게임 엔진] GameEngine 준비 완료! (현재 난이도: ${this.currentLevel}단계, 내부 루프: ${this.autoLoop ? '활성' : '수동 제어'})`);
+  }
+
+  /**
+   * 🌟 게임 난이도 레벨을 1~5단계 중 하나로 설정합니다.
+   * @param {number|string} levelNum - 1 ~ 5
+   */
+  setLevel(levelNum) {
+    const lvl = Math.max(1, Math.min(5, parseInt(levelNum, 10) || 1));
+    this.currentLevel = lvl;
+    const config = LEVEL_CONFIGS[lvl] || LEVEL_CONFIGS[1];
+    this.spawnInterval = config.spawnInterval;
+    console.log(`🎯 [게임 엔진] 난이도 ${lvl}단계(${config.name})로 변경되었습니다.`);
+    this.showNotification(`난이도: ${config.name} (${config.desc})`, '🎯', 2200);
+    this.updateHUD();
+    this.updateBearMood('cheering', `좋아! ${config.name} 단계로 출발해볼까? 🚀`);
+  }
+
+  /**
+   * 🌟 북극곰 캐릭터의 기분과 대사를 변경하고 UI 콜백을 호출합니다.
+   * @param {'dancing'|'cheering'|'worried'|'crying'|'superhero'} mood
+   * @param {string} [speechText]
+   */
+  updateBearMood(mood, speechText = '') {
+    this.bearMood = mood;
+    if (typeof this.onBearMoodChange === 'function') {
+      this.onBearMoodChange(mood, speechText);
+    }
+    // 내부 DOM 직접 갱신 (독립 구동 지원)
+    this._updateBearDOM(mood, speechText);
+  }
+
+  /**
+   * 하단 북극곰 캐릭터 DOM 요소를 직접 갱신합니다.
+   * @private
+   */
+  _updateBearDOM(mood, speechText) {
+    if (this.polarBearHero) {
+      this.polarBearHero.className = `polar-bear-hero mood-${mood}`;
+    }
+
+    if (this.bearAvatar) {
+      if (mood === 'dancing') this.bearAvatar.textContent = '🐻‍❄️';
+      else if (mood === 'cheering') this.bearAvatar.textContent = '🐻‍❄️';
+      else if (mood === 'worried') this.bearAvatar.textContent = '🐻‍❄️';
+      else if (mood === 'crying') this.bearAvatar.textContent = '😭';
+      else if (mood === 'superhero') this.bearAvatar.textContent = '🐻‍❄️';
+    }
+
+    if (this.bearMoodFx) {
+      if (mood === 'dancing') this.bearMoodFx.textContent = '💖';
+      else if (mood === 'cheering') this.bearMoodFx.textContent = '✨';
+      else if (mood === 'worried') this.bearMoodFx.textContent = '💦';
+      else if (mood === 'crying') this.bearMoodFx.textContent = '💧';
+      else if (mood === 'superhero') this.bearMoodFx.textContent = '👑';
+    }
+
+    if (this.bearMoodTitle) {
+      if (mood === 'dancing') this.bearMoodTitle.textContent = '신난 북극곰 춤';
+      else if (mood === 'cheering') this.bearMoodTitle.textContent = '응원하는 북극곰';
+      else if (mood === 'worried') this.bearMoodTitle.textContent = '깜짝 놀란 북극곰';
+      else if (mood === 'crying') this.bearMoodTitle.textContent = '울고 있는 북극곰';
+      else if (mood === 'superhero') this.bearMoodTitle.textContent = '지구의 슈퍼히어로!';
+    }
+
+    if (this.bearSpeechText && speechText) {
+      this.bearSpeechText.textContent = speechText;
+    }
   }
 
   /**
@@ -253,6 +419,20 @@ export class GameEngine {
     this.modalRestartBtn = document.getElementById('modalRestartBtn');
     this.modalCloseBtn = document.getElementById('modalCloseBtn');
 
+    // 🌟 5단계 난이도 레벨 배지 및 선택기 요소
+    this.levelDisplay = document.getElementById('levelDisplay');
+    this.levelSubTitle = document.getElementById('levelSubTitle');
+    this.levelSelect = document.getElementById('levelSelect');
+
+    // 🌟 하단 빙하 위 북극곰 캐릭터 무대 요소
+    this.bottomBearStage = document.getElementById('bottomBearStage');
+    this.polarBearHero = document.getElementById('polarBearHero');
+    this.bearAvatar = document.getElementById('bearAvatar');
+    this.bearMoodFx = document.getElementById('bearMoodFx');
+    this.bearMoodTitle = document.getElementById('bearMoodTitle');
+    this.polarBearSpeech = document.getElementById('polarBearSpeech');
+    this.bearSpeechText = document.getElementById('bearSpeechText');
+
     // 툴바 제어 버튼
     this.gameStartBtn = document.getElementById('gameStartBtn');
     this.gameStartText = document.getElementById('gameStartText');
@@ -270,7 +450,22 @@ export class GameEngine {
    * @private
    */
   _bindDefaultUI() {
-    // 1. 게임 시작 / 일시정지 / 재개 버튼
+    // 🌟 1. 5단계 레벨 선택 드롭다운 연동
+    if (this.levelSelect) {
+      this.levelSelect.addEventListener('change', (e) => {
+        this.setLevel(e.target.value);
+      });
+    }
+
+    // 🌟 2. 하단 북극곰 터치/클릭 시 귀여운 반응
+    if (this.bottomBearStage) {
+      this.bottomBearStage.addEventListener('click', () => {
+        this.sound.playIceChime();
+        this.updateBearMood('dancing', '간지러워요! 히히~ 나쁜 가스를 팡팡 터뜨려줘! 🐻‍❄️✨');
+      });
+    }
+
+    // 3. 게임 시작 / 일시정지 / 재개 버튼
     if (this.gameStartBtn) {
       this.gameStartBtn.addEventListener('click', () => {
         this.sound.init(); // 사용자 클릭 시 Web Audio API 활성화
@@ -501,10 +696,14 @@ export class GameEngine {
       this.setState(GAME_STATE.VICTORY);
       this.sound.playVictory();
       this.showNotification('🎉 축하합니다! 북극 빙하를 지켜냈습니다!', '🏆', 3000);
+      // 🌟 승리 시 북극곰 슈퍼히어로 변신 및 만세 대사!
+      this.updateBearMood('superhero', '만세! 네가 얼음집과 북극을 구했어! 최고 대장님! 🐻‍❄️👑🎉');
     } else {
       this.setState(GAME_STATE.GAME_OVER);
       this.sound.playGameOver();
       this.showNotification('⚠️ 빙하가 모두 녹아내렸습니다... 다시 도전해 북극곰을 지켜주세요!', '😭', 3000);
+      // 🌟 패배 시 북극곰 눈물 반응
+      this.updateBearMood('crying', '얼음집이 다 녹아버렸어... 다시 도전해줄 거지? 🐻‍❄️😭');
     }
 
     if (this.gameStartText) this.gameStartText.textContent = '다시 도전';
@@ -563,7 +762,7 @@ export class GameEngine {
         points.push({
           x: px,
           y: py,
-          radius: hand.isPinching ? 38 : 26, // 핀치 시 판정 반경 확장
+          radius: hand.isPinching ? 60 : 42, // 🌟 초등 1학년 맞춤형: 넉넉한 터치 판정 (일반 42px, 핀치 실드 60px)
           isPinching: hand.isPinching,
           type: 'INDEX'
         });
@@ -576,7 +775,7 @@ export class GameEngine {
         points.push({
           x: px,
           y: py,
-          radius: 24,
+          radius: 36, // 엄지도 36px로 넉넉하게
           isPinching: true,
           type: 'THUMB'
         });
@@ -637,18 +836,35 @@ export class GameEngine {
       case 'CO2':
         // 탄소 감축 점수 증가
         this.carbonScore += bubble.score;
+        this.consecutiveHits++;
         this.sound.playPop();
         // 상쾌한 파편 파티클 및 플로팅 텍스트
-        this._createExplosionParticles(bubble.x, bubble.y, bubble.borderColor, 22);
-        this._addFloatingText(`+${bubble.score}kg CO₂`, bubble.x, bubble.y - 10, '#00ffcc');
+        this._createExplosionParticles(bubble.x, bubble.y, bubble.borderColor, 28);
+        this._addFloatingText(`+${bubble.score}kg 나쁜가스 잡음! ☁️`, bubble.x, bubble.y - 15, '#00ffcc');
+
+        // 🌟 북극곰 반응: 3연속 콤보 시 신나는 댄스!
+        if (this.consecutiveHits >= 5) {
+          this.updateBearMood('dancing', `대단해! ${this.consecutiveHits}연속 팡팡! 🐻‍❄️🌟`);
+        } else if (this.consecutiveHits >= 3) {
+          this.updateBearMood('dancing', `신난다! ${this.consecutiveHits}연속 팡팡! 🐻‍❄️✨`);
+        } else {
+          this.updateBearMood('cheering', '잘했어! 나쁜 가스를 물리쳤어! ❄️');
+        }
         break;
 
       case 'CH4':
         // 메탄가스 높은 점수 증가
         this.carbonScore += bubble.score;
+        this.consecutiveHits++;
         this.sound.playPop();
-        this._createExplosionParticles(bubble.x, bubble.y, '#4ade80', 28);
-        this._addFloatingText(`+${bubble.score}kg CH₄!`, bubble.x, bubble.y - 10, '#4ade80');
+        this._createExplosionParticles(bubble.x, bubble.y, '#4ade80', 35);
+        this._addFloatingText(`+${bubble.score}kg 초록가스 대성공! 🫧`, bubble.x, bubble.y - 15, '#4ade80');
+
+        if (this.consecutiveHits >= 3) {
+          this.updateBearMood('dancing', `우와 고득점! ${this.consecutiveHits}연속 팡팡! 🐻‍❄️🎉`);
+        } else {
+          this.updateBearMood('cheering', '초록 메탄가스를 잡았어! 멋져! 🌿');
+        }
         break;
 
       case 'ICE':
@@ -656,20 +872,23 @@ export class GameEngine {
         this.glacierHealth = Math.min(100, this.glacierHealth + bubble.heal);
         this.sound.playIceChime();
         // 크리스탈 눈꽃 반짝이 별가루 파티클
-        this._createIceSparkleParticles(bubble.x, bubble.y, 25);
-        this._addFloatingText(`빙하 +${bubble.heal}% 회복! ❄️`, bubble.x, bubble.y - 10, '#00f2fe');
+        this._createIceSparkleParticles(bubble.x, bubble.y, 30);
+        this._addFloatingText(`빙하 얼음집 +${bubble.heal}% 회복! ❄️`, bubble.x, bubble.y - 15, '#00f2fe');
+        this.updateBearMood('dancing', '시원해! 얼음집이 튼튼해졌어! 고마워! 🧊💖');
         break;
 
       case 'BOMB':
         // ☠️ 유독 매연 폭탄 폭발! 대폭 감점 및 화면 흔들림
         this.glacierHealth = Math.max(0, this.glacierHealth - bubble.damage);
+        this.consecutiveHits = 0; // 콤보 초기화
         this.sound.playExplosion();
         // 강한 화면 흔들림 트리거
-        this.shakeIntensity = 18;
+        this.shakeIntensity = 22;
         // 거대한 화염/연기 파티클
-        this._createBombExplosionParticles(bubble.x, bubble.y, 45);
-        this._addFloatingText(`위험! -${bubble.damage}% ⚠️`, bubble.x, bubble.y - 10, '#ef4444');
-        this.showNotification('☠️ 매연 폭탄 피격! 빙하가 크게 파괴되었습니다!', '💥', 1500);
+        this._createBombExplosionParticles(bubble.x, bubble.y, 50);
+        this._addFloatingText(`위험 폭탄! -${bubble.damage}% ⚠️`, bubble.x, bubble.y - 15, '#ef4444');
+        this.showNotification('☠️ 으악! 매연 폭탄이 터졌어요! 피해야 해요!', '💥', 1800);
+        this.updateBearMood('crying', '으앙! 폭탄이 터져서 얼음이 깨졌어! 🐻‍❄️😭');
 
         // 체력이 0이 되었는지 즉시 점검
         if (this.glacierHealth <= 0) {
@@ -697,7 +916,7 @@ export class GameEngine {
    */
 
   /**
-   * 확률 가중치에 따라 새로운 방울 1개를 화면 상단에서 스폰합니다.
+   * 🌟 5단계 난이도 레벨 설정에 따라 방울을 화면 상단에서 스폰합니다.
    * @private
    */
   _spawnBubble() {
@@ -705,40 +924,58 @@ export class GameEngine {
     const height = this.canvas.height;
     if (width <= 0 || height <= 0) return;
 
-    // 1. 가중치 기반 무작위 방울 선택
-    const types = Object.values(BUBBLE_TYPES);
-    const totalWeight = types.reduce((sum, item) => sum + item.spawnWeight, 0);
-    let randomNum = Math.random() * totalWeight;
-    let selectedType = types[0];
+    // 현재 레벨 설정 가져오기
+    const levelConfig = LEVEL_CONFIGS[this.currentLevel] || LEVEL_CONFIGS[1];
 
-    for (let i = 0; i < types.length; i++) {
-      if (randomNum < types[i].spawnWeight) {
-        selectedType = types[i];
+    // 화면 내 최대 허용 방울 수 초과 시 스폰 제한 (아이들 혼란 방지)
+    if (this.bubbles.length >= levelConfig.maxBubbles) return;
+
+    // 1. 현재 레벨의 오브젝트별 가중치 적용
+    const weights = [
+      { type: BUBBLE_TYPES.CO2, weight: levelConfig.co2Weight },
+      { type: BUBBLE_TYPES.CH4, weight: levelConfig.ch4Weight },
+      { type: BUBBLE_TYPES.ICE, weight: levelConfig.iceWeight },
+      { type: BUBBLE_TYPES.BOMB, weight: levelConfig.bombWeight }
+    ];
+
+    const totalWeight = weights.reduce((sum, item) => sum + item.weight, 0);
+    if (totalWeight <= 0) return;
+
+    let randomNum = Math.random() * totalWeight;
+    let selectedType = BUBBLE_TYPES.CO2;
+
+    for (let i = 0; i < weights.length; i++) {
+      if (randomNum < weights[i].weight) {
+        selectedType = weights[i].type;
         break;
       }
-      randomNum -= types[i].spawnWeight;
+      randomNum -= weights[i].weight;
     }
 
-    // 2. 스폰 위치 및 물리 속성 계산
-    const margin = selectedType.radius + 30;
-    const spawnX = margin + Math.random() * (width - margin * 2);
-    const spawnY = -selectedType.radius - 10; // 화면 바로 위에서 부드럽게 등장
+    // 2. 레벨별 방울 스케일 크기 계산 (1단계는 특히 더 커서 터뜨리기 쉬움)
+    const scale = levelConfig.bubbleScale || 1.0;
+    const finalRadius = selectedType.radius * scale;
 
-    // 게임 경과 시간에 따른 미세한 속도 보정 (후반부로 갈수록 조금 빨라짐)
-    const timeFactor = (60 - this.timeLeft) / 60; // 0.0 ~ 1.0
-    const speed = selectedType.speedMin + Math.random() * (selectedType.speedMax - selectedType.speedMin) + (timeFactor * 0.8);
+    const margin = finalRadius + 30;
+    const spawnX = margin + Math.random() * (width - margin * 2);
+    const spawnY = -finalRadius - 10; // 화면 바로 위에서 부드럽게 등장
+
+    // 3. 레벨별 하강 속도 계산 (속도 배율 적용)
+    const baseSpeed = selectedType.speedMin + Math.random() * (selectedType.speedMax - selectedType.speedMin);
+    const finalSpeed = baseSpeed * levelConfig.speedMultiplier;
 
     // 좌우 살랑살랑 부유 모션을 위한 사인파 파라미터
     const floatSpeed = 0.002 + Math.random() * 0.003;
-    const floatAmplitude = 18 + Math.random() * 22; // 좌우 진폭 (px)
+    const floatAmplitude = 20 + Math.random() * 24; // 좌우 진폭 (px)
     const phaseOffset = Math.random() * Math.PI * 2;
 
     this.bubbles.push({
       ...selectedType,
+      radius: finalRadius,
       x: spawnX,
       y: spawnY,
       baseX: spawnX,
-      speedY: speed,
+      speedY: finalSpeed,
       floatSpeed: floatSpeed,
       floatAmplitude: floatAmplitude,
       phase: phaseOffset,
@@ -784,11 +1021,15 @@ export class GameEngine {
         // 온실가스(CO2, CH4)가 빙하에 닿으면 체력 감소 및 녹는 소리/이펙트
         if (b.type === 'CO2' || b.type === 'CH4') {
           this.glacierHealth = Math.max(0, this.glacierHealth - b.damage);
+          this.consecutiveHits = 0; // 콤보 초기화
           this.sound.playGlacierMelt();
 
+          // 🌟 북극곰 당황/깜짝 반응
+          this.updateBearMood('worried', '앗 뜨거! 얼음집이 녹고 있어! 도와줘! 🐻‍❄️💦');
+
           // 바닥에서 뜨거운 증기/연기 파티클 생성
-          this._createGlacierMeltSmoke(b.x, glacierTopY, 15);
-          this._addFloatingText(`빙하 -${b.damage}%! 💧`, b.x, glacierTopY - 20, '#ef4444');
+          this._createGlacierMeltSmoke(b.x, glacierTopY, 18);
+          this._addFloatingText(`빙하 얼음집 -${b.damage}%! 💧`, b.x, glacierTopY - 20, '#ef4444');
 
           // 체력이 0%가 되면 게임 오버 패배
           if (this.glacierHealth <= 0) {
@@ -1246,7 +1487,8 @@ export class GameEngine {
   }
 
   /**
-   * 떨어지는 4종의 방울 오브젝트를 아름다운 입체 구체로 렌더링합니다.
+   * 🌟 [초등학교 1학년 맞춤형] 커다란 방울, 큰 이모지 및 쉬운 한글 라벨 렌더링
+   * - 1~2m 떨어진 거리에서도 한눈에 읽을 수 있도록 폰트와 이모지를 2배 이상 키우고 고대비 테두리 적용!
    * @private
    */
   _renderBubbles(ctx) {
@@ -1255,11 +1497,11 @@ export class GameEngine {
     this.bubbles.forEach(b => {
       ctx.save();
 
-      // 1. 방울 외곽 빛나는 네온 글로우(Glow) 효과
-      ctx.shadowBlur = 16;
+      // 1. 방울 외곽 빛나는 네온 글로우(Glow) 효과 강화
+      ctx.shadowBlur = 24;
       ctx.shadowColor = b.glowColor;
 
-      // 2. 3D 입체 구체 그라데이션 (하이라이트 빛 반사 느낌)
+      // 2. 3D 입체 구체 그라데이션 (알록달록 풍선 느낌)
       const grad = ctx.createRadialGradient(
         b.x - b.radius * 0.35,
         b.y - b.radius * 0.35,
@@ -1270,29 +1512,30 @@ export class GameEngine {
       );
       grad.addColorStop(0, '#ffffff'); // 왼쪽 위 하얀 반사광
       grad.addColorStop(0.35, b.baseColor);
-      grad.addColorStop(1, b.borderColor);
+      grad.addColorStop(0.9, b.borderColor);
+      grad.addColorStop(1, '#ffffff');
 
       ctx.fillStyle = grad;
-      ctx.strokeStyle = b.borderColor;
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3.5;
 
       ctx.beginPath();
       // 살짝 숨쉬듯 박동하는 미세 펄스
-      const pulse = Math.sin(b.pulsePhase) * 1.5;
+      const pulse = Math.sin(b.pulsePhase) * 2.0;
       const currentRadius = b.radius + pulse;
       ctx.arc(b.x, b.y, currentRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
 
       // 3. 투명 비눗방울 반사광 호(Arc) 추가
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
-      ctx.lineWidth = 2.0;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 3.0;
       ctx.shadowBlur = 0; // 텍스트를 위해 글로우 끄기
       ctx.beginPath();
       ctx.arc(b.x, b.y, currentRadius * 0.72, -Math.PI * 0.75, -Math.PI * 0.25);
       ctx.stroke();
 
-      // 4. [거울 모드 텍스트 반전 보정 핵심 로직]
+      // 4. [거울 모드 텍스트 반전 보정 & 1학년용 대형 텍스트 렌더링]
       // 캔버스 전체가 CSS scaleX(-1)되어 있으므로 글자를 그냥 쓰면 거울처럼 뒤집힙니다!
       // 따라서 방울 중심에서 scale(-1, 1)을 한 번 더 적용하여 글자가 똑바로 보이게 만듭니다!
       ctx.save();
@@ -1301,26 +1544,61 @@ export class GameEngine {
         ctx.scale(-1, 1);
       }
 
-      // 방울 중앙 라벨 (CO2, CH4, ❄️, ☠️)
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      if (b.type === 'ICE' || b.type === 'BOMB') {
-        // 이모지 라벨
-        ctx.font = 'bold 22px "Noto Sans KR", sans-serif';
-        ctx.fillText(b.label, 0, -2);
-      } else {
-        // 영문 가스 라벨
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 15px "Rajdhani", "Noto Sans KR", sans-serif';
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-        ctx.shadowBlur = 4;
-        ctx.fillText(b.label, 0, -3);
+      // (A) 상단: 크고 선명한 이모지 아이콘 (☁️, 🫧, ❄️, ☠️)
+      ctx.font = '32px "Noto Sans KR", sans-serif';
+      ctx.fillText(b.icon || '✨', 0, -currentRadius * 0.36);
 
-        // 아래쪽 작은 서브라벨 (+10kg 등)
-        ctx.font = 'bold 10px "Rajdhani", sans-serif';
-        ctx.fillStyle = b.type === 'CH4' ? '#86efac' : '#cbd5e1';
-        ctx.fillText(b.subLabel, 0, 11);
+      // (B) 중앙 및 하단 라벨 (가스 vs 눈꽃 vs 폭탄)
+      if (b.type === 'CO2' || b.type === 'CH4') {
+        // 중앙: 매우 굵고 선명한 가스 기호 (CO₂, CH₄)
+        ctx.font = '900 32px "Rajdhani", "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 4.5;
+        ctx.strokeText(b.label, 0, 2);
+        ctx.fillText(b.label, 0, 2);
+
+        // 하단: 초등 1학년용 쉬운 한글 뱃지 ("나쁜 가스 +10", "초록 가스 +25")
+        ctx.font = '800 13px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = b.type === 'CH4' ? '#86efac' : '#fef08a';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.lineWidth = 3.5;
+        const kidText = `${b.kidName || b.name} ${b.subLabel}`;
+        ctx.strokeText(kidText, 0, currentRadius * 0.44);
+        ctx.fillText(kidText, 0, currentRadius * 0.44);
+      } else if (b.type === 'ICE') {
+        // 눈꽃 회복 결정
+        ctx.font = '900 17px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 4;
+        ctx.strokeText('얼음 회복! ❄️', 0, 4);
+        ctx.fillText('얼음 회복! ❄️', 0, 4);
+
+        ctx.font = '800 13px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#7dd3fc';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.strokeText('+15% 체력 충전', 0, currentRadius * 0.45);
+        ctx.fillText('+15% 체력 충전', 0, currentRadius * 0.45);
+      } else if (b.type === 'BOMB') {
+        // 유독 매연 폭탄
+        ctx.font = '900 17px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#fee2e2';
+        ctx.strokeStyle = '#991b1b';
+        ctx.lineWidth = 4;
+        ctx.strokeText('위험! 피해요! ⚠️', 0, 4);
+        ctx.fillText('위험! 피해요! ⚠️', 0, 4);
+
+        ctx.font = '800 12px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#fca5a5';
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.strokeText('닿으면 쾅! 빙하 파괴', 0, currentRadius * 0.45);
+        ctx.fillText('닿으면 쾅! 빙하 파괴', 0, currentRadius * 0.45);
       }
 
       ctx.restore(); // 텍스트 반전 복원
@@ -1469,6 +1747,31 @@ export class GameEngine {
       } else {
         this.bearStatusIcon.textContent = '😭';   // 30% 미만: 울고 있는 북극곰
         this.bearStatusIcon.title = '빙하가 거의 남아있지 않습니다! 서둘러 온실가스를 막아주세요!';
+      }
+    }
+
+    // 🌟 5. 5단계 레벨 배지 표시 동기화
+    const lvlConfig = LEVEL_CONFIGS[this.currentLevel] || LEVEL_CONFIGS[1];
+    if (this.levelDisplay) {
+      this.levelDisplay.textContent = `${this.currentLevel}단계`;
+    }
+    if (this.levelSubTitle) {
+      this.levelSubTitle.textContent = lvlConfig.name;
+    }
+    if (this.levelSelect && this.levelSelect.value !== String(this.currentLevel)) {
+      this.levelSelect.value = String(this.currentLevel);
+    }
+
+    // 🌟 6. 하단 북극곰 일상 기분 및 말풍선 자동 반영 (체력 기준)
+    if (this.state === GAME_STATE.PLAYING && this.shakeIntensity <= 0) {
+      if (roundedHealth >= 80 && this.consecutiveHits >= 3) {
+        this.updateBearMood('dancing', `대단해! ${this.consecutiveHits}연속 팡팡! 🐻‍❄️✨`);
+      } else if (roundedHealth >= 70) {
+        this.updateBearMood('cheering', '우와! 얼음집이 아주 튼튼해! ❄️');
+      } else if (roundedHealth >= 30) {
+        this.updateBearMood('worried', '친구야 힘내! 나쁜 가스를 막아줘! 🐻‍❄️💦');
+      } else {
+        this.updateBearMood('crying', '으앙! 얼음집이 너무 많이 녹았어! 도와줘! 🐻‍❄️😭');
       }
     }
   }

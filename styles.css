@@ -1177,4 +1177,246 @@ html, body {
     font-size: 1rem;
     padding: 0.85rem 1.5rem;
   }
+
+  .bottom-bear-stage {
+    bottom: 6.5rem;
+  }
+
+  .bear-avatar {
+    font-size: 5rem;
+  }
 }
+
+/* ==========================================================================
+   [13. 초등학교 1학년 맞춤형 컴포넌트: 레벨 배지 & 하단 북극곰 캐릭터 무대]
+   ========================================================================== */
+
+/* 13-1. 상단 HUD: 5단계 레벨 배지 카드 */
+.level-card {
+  border-color: #ffd700;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.45);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(10, 25, 47, 0.75) 100%);
+}
+
+.level-value-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.level-number {
+  color: #ffe600;
+  text-shadow: 0 0 10px rgba(255, 230, 0, 0.7);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.level-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff275;
+  white-space: nowrap;
+}
+
+/* 13-2. 하단 제어 툴바: 5단계 난이도 선택 드롭다운 */
+.level-select-wrapper {
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.level-select {
+  background: rgba(26, 38, 57, 0.95);
+  color: #ffe600;
+  font-weight: 700;
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+
+.level-select:hover,
+.level-select:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+}
+
+/* 13-3. 하단 빙하 & 살아 숨쉬는 북극곰 캐릭터 무대 (.bottom-bear-stage) */
+.bottom-bear-stage {
+  position: absolute;
+  bottom: 5.5rem;
+  left: 2.5rem; /* 화면 좌하단 빙하 위에 예쁘게 배치 */
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.bottom-bear-stage:hover {
+  transform: scale(1.05);
+}
+
+/* 북극곰 대화 말풍선 */
+.bear-speech-bubble {
+  position: relative;
+  background: #ffffff;
+  color: #0b203c;
+  padding: 0.6rem 1.1rem;
+  border-radius: 20px;
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 15px rgba(0, 242, 254, 0.5);
+  margin-bottom: 0.6rem;
+  white-space: nowrap;
+  animation: speech-bounce 2.5s infinite ease-in-out;
+  border: 2px solid var(--ice-cyan);
+}
+
+.bubble-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #ffffff;
+}
+
+@keyframes speech-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* 북극곰 메인 히어로 캐릭터 박스 */
+.polar-bear-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+}
+
+.bear-character-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 대형 북극곰 아바타 */
+.bear-avatar {
+  font-size: 3.8rem;
+  line-height: 1;
+  user-select: none;
+  transition: transform 0.3s var(--ease-bounce);
+}
+
+/* 북극곰 주변 맴도는 감정 이펙트 (하트, 눈물, 별가루 등) */
+.bear-mood-fx {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  font-size: 1.5rem;
+  animation: mood-fx-pop 1.8s infinite ease-in-out;
+}
+
+@keyframes mood-fx-pop {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  50% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+}
+
+/* 북극곰이 서 있는 받침대 라벨 */
+.bear-base-pedestal {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+  background: rgba(10, 25, 47, 0.85);
+  border: 1px solid var(--ice-cyan);
+  border-radius: 9999px;
+  padding: 0.2rem 0.65rem;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+.pedestal-ice {
+  font-size: 0.85rem;
+}
+
+.pedestal-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--ice-cyan);
+}
+
+/* --------------------------------------------------------------------------
+   [13-4. 북극곰 5대 감정/상태별 애니메이션 키프레임]
+   1. 초신남 (Dancing Bear): 양손 흔들며 깡충깡충 뜀
+   2. 응원 (Cheering Bear): 부드럽게 좌우로 흔들리며 파이팅
+   3. 당황/깜짝 (Worried Bear): 땀 흘리며 덜덜 떨림
+   4. 위기/울음 (Crying Bear): 눈물 뚝뚝 흘리며 엉엉 울기
+   5. 승리/슈퍼히어로 (Superhero Bear): 황금빛 오라와 만세 점프
+   -------------------------------------------------------------------------- */
+
+/* 1. 초신남 댄싱 모드 */
+.polar-bear-hero.mood-dancing .bear-avatar {
+  animation: bear-dance 0.7s infinite alternate ease-in-out;
+}
+
+@keyframes bear-dance {
+  0% { transform: translateY(0) rotate(-8deg) scale(1.05); }
+  50% { transform: translateY(-16px) rotate(0deg) scale(1.15); }
+  100% { transform: translateY(0) rotate(8deg) scale(1.05); }
+}
+
+/* 2. 평상시 응원 모드 */
+.polar-bear-hero.mood-cheering .bear-avatar {
+  animation: bear-cheer 1.4s infinite ease-in-out;
+}
+
+@keyframes bear-cheer {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.06); }
+}
+
+/* 3. 당황/깜짝 모드 (온실가스가 빙하에 닿았을 때) */
+.polar-bear-hero.mood-worried .bear-avatar {
+  animation: bear-worry 0.3s infinite ease-in-out;
+}
+
+@keyframes bear-worry {
+  0%, 100% { transform: translateX(-3px) rotate(-3deg); }
+  50% { transform: translateX(3px) rotate(3deg); }
+}
+
+/* 4. 위기/울음 모드 (체력 30% 이하) */
+.polar-bear-hero.mood-crying .bear-avatar {
+  animation: bear-cry 0.9s infinite ease-in-out;
+}
+
+@keyframes bear-cry {
+  0%, 100% { transform: scale(0.95) translateY(2px); }
+  50% { transform: scale(0.9) translateY(6px); }
+}
+
+/* 5. 승리/슈퍼히어로 모드 */
+.polar-bear-hero.mood-superhero .bear-avatar {
+  animation: bear-superhero 0.8s infinite alternate ease-in-out;
+  filter: drop-shadow(0 0 16px #ffd700);
+}
+
+@keyframes bear-superhero {
+  0% { transform: translateY(0) scale(1.1); }
+  100% { transform: translateY(-20px) scale(1.25); }
+}
+
+/* 모바일 및 작은 화면 반응형 대응 */
+@media (max-width: 768px) {
+  .bottom-bear-stage {
+    bottom: 8.5rem;
+    left: 1rem;
+    transform: scale(0.85);
+  }
+}
+
