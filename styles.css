@@ -1,0 +1,1180 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   북극 빙하 지킴이 (Arctic Ice Guardian) - 메인 스타일시트
+   - 디자인 콘셉트: 시원한 북극 빙하 감성의 네온(Neon) & 글래스모피즘(Glassmorphism)
+   - 특징: OBS Studio / ATEM 방송 호환 투명 모드, 고대비 교실 프로젝터 최적화, 반응형 지원
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   [1. CSS 테마 변수 (Design Tokens)]
+   - 교육자나 개발자가 색상, 여백, 블러 강도를 쉽게 수정할 수 있도록 변수로 분리했습니다.
+   -------------------------------------------------------------------------- */
+:root {
+  /* [북극 & 네온 컬러 팔레트] */
+  --ice-cyan: #00f2fe;             /* 찬란한 빙하 시안 */
+  --ice-blue: #4facfe;             /* 깊은 바다 블루 */
+  --neon-mint: #00ffcc;            /* 오로라 네온 민트 (성공 및 안전) */
+  --deep-ocean: #050e1a;           /* 심해 다크 네이비 (배경색) */
+  --surface-dark: #0a192f;         /* 카드 기본 딥 네이비 */
+  --warning-yellow: #ffd000;       /* 주의 경고 노란색 */
+  --danger-red: #ff3366;           /* 위험 네온 레드 (빙하 위기) */
+  --text-white: #ffffff;           /* 순백 텍스트 */
+  --text-muted: #b0c7de;           /* 서브 안내 텍스트 */
+  --text-dim: #6c88a8;             /* 비활성화 텍스트 */
+
+  /* [글래스모피즘(유리 효과) 설정] */
+  --glass-bg: rgba(10, 25, 47, 0.65);             /* 반투명 유리 배경 */
+  --glass-bg-hover: rgba(16, 38, 70, 0.85);       /* 호버 시 조금 더 선명한 유리 */
+  --glass-border: rgba(0, 242, 254, 0.28);        /* 은은한 네온 얼음 테두리 */
+  --glass-border-bright: rgba(0, 255, 204, 0.65); /* 강조 네온 테두리 */
+  --glass-blur: blur(14px);                       /* 배경 흐림 필터 강도 */
+  --glass-shadow: 0 8px 32px 0 rgba(0, 10, 30, 0.45); /* 입체감 그림자 */
+
+  /* [네온 발광 효과] */
+  --neon-glow-cyan: 0 0 12px rgba(0, 242, 254, 0.55), 0 0 24px rgba(79, 172, 254, 0.35);
+  --neon-glow-mint: 0 0 14px rgba(0, 255, 204, 0.65), 0 0 28px rgba(0, 255, 204, 0.35);
+  --neon-glow-red: 0 0 14px rgba(255, 51, 102, 0.75), 0 0 30px rgba(255, 51, 102, 0.4);
+
+  /* [폰트 패밀리] */
+  --font-base: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-digital: 'Rajdhani', 'Noto Sans KR', monospace;
+
+  /* [애니메이션 전환 타이밍] */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.2s;
+  --duration-normal: 0.35s;
+}
+
+/* --------------------------------------------------------------------------
+   [2. 기본 리셋 및 글로벌 설정]
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh; /* 모바일 브라우저 주소창 높이 변화 대응 */
+  overflow: hidden; /* 게임 화면 바깥 스크롤 방지 */
+  background-color: var(--deep-ocean);
+  font-family: var(--font-base);
+  color: var(--text-white);
+  user-select: none; /* 아이패드 및 터치스크린에서 원치 않는 텍스트 드래그 방지 */
+  -webkit-user-select: none;
+}
+
+/* 스크린 리더용 숨김 클래스 (웹 접근성 준수) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pointer-events-none {
+  pointer-events: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   [3. 메인 앱 컨테이너 및 뷰포트 레이아웃]
+   -------------------------------------------------------------------------- */
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 20%, #0d223f 0%, var(--deep-ocean) 80%);
+  overflow: hidden;
+}
+
+/* 무대 영역 (웹캠 + 캔버스) */
+.stage-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #02070f;
+  z-index: 1;
+}
+
+/* 웹캠 비디오 엘리먼트 */
+#webcam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 화면을 가득 채우면서 찌그러지지 않게 유지 */
+  z-index: 1;
+  transition: transform var(--duration-normal) var(--ease-smooth), opacity var(--duration-normal);
+}
+
+/* 게임 인터랙션 & 모션 오버레이 캔버스 */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  pointer-events: auto; /* 터치 및 마우스 이벤트 수신 */
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+/* 북극 비주얼 효과 레이어 (비네팅, 오로라 빛 등) */
+.stage-fx-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  /* 가장자리가 부드럽게 어두워지는 북극 심해 비네팅 효과 */
+  background: radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.03) 0%, rgba(5, 14, 26, 0.45) 85%);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   [4. 거울 모드 (Mirror Mode - 좌우 반전)]
+   - 학생/사용자가 웹캠 앞에 섰을 때 실제 거울을 보듯 직관적으로 반응하도록 처리합니다.
+   - UI는 반전되지 않고 카메라 비디오와 게임 캔버스만 반전됩니다.
+   -------------------------------------------------------------------------- */
+.app-container.mirror-active #webcam,
+.app-container.mirror-active #gameCanvas {
+  transform: scaleX(-1);
+}
+
+/* --------------------------------------------------------------------------
+   [5. OBS Studio / ATEM 방송 모드]
+   - OBS 브라우저 소스로 띄울 때 배경을 완벽히 투명하게 처리합니다.
+   - 크로마키(그린스크린) 모드로 스위칭할 수 있는 스타일도 함께 제공합니다.
+   -------------------------------------------------------------------------- */
+
+/* 5-1. OBS 투명 모드 (.obs-mode) */
+.app-container.obs-mode,
+.app-container.obs-mode body,
+.app-container.obs-mode .stage-container {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+.app-container.obs-mode #webcam {
+  /* OBS에서 자체 웹캠 소스를 아래에 깔고 사용할 수 있도록 비디오를 숨깁니다 */
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.app-container.obs-mode .stage-fx-overlay {
+  display: none !important;
+}
+
+/* 5-2. 크로마키 그린스크린 모드 (.chromakey-mode) */
+.app-container.chromakey-mode,
+.app-container.chromakey-mode .stage-container {
+  background: #00ff00 !important; /* 방송용 순수 그린스크린 */
+  background-color: #00ff00 !important;
+}
+
+.app-container.chromakey-mode #webcam {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.app-container.chromakey-mode .stage-fx-overlay {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   [6. UI 레이어 (상단 HUD, 제어 툴바, 모달)]
+   -------------------------------------------------------------------------- */
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  z-index: 10;
+  pointer-events: none; /* 배경 클릭이 캔버스로 통과되도록 기본 설정 */
+}
+
+/* UI 레이어 내부의 모든 대화형 컨트롤은 클릭 가능하도록 복구 */
+.hud-top,
+.toolbar-bottom,
+.notification-banner,
+.guide-card,
+.modal-card {
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   [7. 상단 헤더 HUD (헤드업 디스플레이)]
+   -------------------------------------------------------------------------- */
+.hud-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* 7-1. 로고 & 프로젝트 타이틀 */
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: var(--glass-shadow);
+  transition: transform var(--duration-fast), border-color var(--duration-fast);
+}
+
+.brand-group:hover {
+  border-color: var(--ice-cyan);
+  box-shadow: var(--neon-glow-cyan);
+}
+
+.brand-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(79, 172, 254, 0.15));
+  border-radius: 50%;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+}
+
+.brand-icon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 0 6px var(--ice-cyan));
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-white);
+  line-height: 1.2;
+}
+
+.brand-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--ice-cyan);
+  text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+}
+
+/* 7-2. 중앙: 빙하 보존율 게이지 (Health Bar) */
+.glacier-status-container {
+  flex: 1;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.glacier-status-container:hover {
+  border-color: var(--glass-border-bright);
+}
+
+/* 북극곰 아이콘 박스 */
+.glacier-icon-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.25) 0%, rgba(10, 25, 47, 0.6) 80%);
+  border: 1.5px solid var(--ice-cyan);
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+  animation: bear-float 3s ease-in-out infinite;
+}
+
+.bear-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+@keyframes bear-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.glacier-gauge-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.glacier-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.gauge-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.gauge-value {
+  font-family: var(--font-digital);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ice-cyan);
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
+  transition: color var(--duration-fast);
+}
+
+/* 게이지 트랙 (바탕) */
+.health-track {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 실제 차오르는 체력 바 (Fill) */
+.health-bar-fill {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00f2fe 0%, #00ffcc 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 12px rgba(0, 255, 204, 0.8);
+  transition: width 0.4s var(--ease-smooth), background 0.4s ease;
+}
+
+/* 체력 바 내부 흐르는 빛줄기 애니메이션 */
+.health-bar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 체력이 30% 미만으로 떨어졌을 때의 긴급 경고 상태 스타일 */
+.glacier-status-container.danger {
+  border-color: var(--danger-red);
+  box-shadow: var(--neon-glow-red);
+  animation: pulse-danger 1.2s infinite ease-in-out;
+}
+
+.glacier-status-container.danger .health-bar-fill {
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b8b 100%);
+  box-shadow: 0 0 14px rgba(255, 51, 102, 0.9);
+}
+
+.glacier-status-container.danger .gauge-value {
+  color: var(--danger-red);
+  text-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+    border-color: rgba(255, 51, 102, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 51, 102, 0.85);
+    border-color: rgba(255, 51, 102, 1);
+  }
+}
+
+/* 7-3. 우측: 타이머 & 점수판 그룹 */
+.metrics-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.hud-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.hud-card:hover {
+  border-color: var(--glass-border-bright);
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1.15rem;
+  min-width: 140px;
+}
+
+.metric-icon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 6px rgba(0, 242, 254, 0.4));
+}
+
+.metric-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.timer-value-box,
+.score-value-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.digital-number {
+  font-family: var(--font-digital);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-white);
+  letter-spacing: 0.03em;
+}
+
+/* 타이머 전용 강조 */
+.timer-card .digital-number {
+  color: var(--ice-cyan);
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+}
+
+/* 점수 전용 강조 */
+.score-card .digital-number {
+  color: var(--neon-mint);
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.6);
+}
+
+.unit-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* 타이머 10초 미만 남았을 때 빨간색 경고 애니메이션 */
+.timer-card.warning {
+  border-color: var(--danger-red);
+  animation: pulse-danger 0.8s infinite ease-in-out;
+}
+
+.timer-card.warning .digital-number {
+  color: var(--danger-red);
+  text-shadow: 0 0 12px rgba(255, 51, 102, 0.9);
+}
+
+/* 점수 획득 시 튀는 팝업 애니메이션 클래스 */
+.score-pop {
+  animation: score-bump 0.3s var(--ease-bounce);
+}
+
+@keyframes score-bump {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); color: #ffffff; text-shadow: 0 0 16px #ffffff; }
+  100% { transform: scale(1); }
+}
+
+/* --------------------------------------------------------------------------
+   [8. 중앙 알림 토스트 (메시지 배너)]
+   -------------------------------------------------------------------------- */
+.notification-banner {
+  position: absolute;
+  top: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1.4rem;
+  background: rgba(6, 16, 30, 0.85);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--neon-mint);
+  border-radius: 9999px;
+  box-shadow: var(--neon-glow-mint);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-white);
+  z-index: 50;
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.notification-banner.hidden {
+  opacity: 0;
+  transform: translate(-50%, -10px) scale(0.95);
+  pointer-events: none;
+}
+
+.notification-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   [9. 하단 제어 툴바]
+   -------------------------------------------------------------------------- */
+.toolbar-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 9-1. 카메라 선택 드롭다운 스타일 */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-icon {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 1rem;
+  color: var(--ice-cyan);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.styled-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(10, 25, 47, 0.8);
+  color: var(--text-white);
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.65rem 2.25rem 0.65rem 2.4rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300f2fe' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
+
+.styled-select:hover,
+.styled-select:focus {
+  border-color: var(--ice-cyan);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+}
+
+.styled-select option {
+  background-color: var(--surface-dark);
+  color: var(--text-white);
+}
+
+/* 9-2. 버튼 공통 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.65rem 1.15rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--duration-fast) var(--ease-smooth);
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* 보조 툴바 버튼 (.btn-tool) */
+.btn-tool {
+  background: rgba(16, 38, 70, 0.6);
+  color: var(--text-muted);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.btn-tool:hover {
+  background: var(--glass-bg-hover);
+  color: var(--text-white);
+  border-color: var(--ice-cyan);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 버튼이 켜진 상태 (Active) */
+.btn-tool.active {
+  background: rgba(0, 242, 254, 0.18);
+  color: var(--ice-cyan);
+  border-color: var(--ice-cyan);
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.45);
+}
+
+.btn-tool.active .btn-icon {
+  filter: drop-shadow(0 0 6px var(--ice-cyan));
+}
+
+/* 메인 시작 / 중요 액션 버튼 (.btn-primary) */
+.btn-primary {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: #031024;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--neon-glow-cyan);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #26f6ff 0%, #68baff 100%);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.8), 0 0 35px rgba(79, 172, 254, 0.5);
+  transform: translateY(-2px);
+}
+
+/* 게임 진행 중 정지 버튼으로 전환될 때 */
+.btn-primary.danger-stop {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b8b 100%);
+  color: #ffffff;
+  box-shadow: var(--neon-glow-red);
+}
+
+.btn-primary.danger-stop:hover {
+  background: linear-gradient(135deg, #ff4d7d 0%, #ff859f 100%);
+  box-shadow: 0 0 22px rgba(255, 51, 102, 0.9);
+}
+
+/* 보조 닫기 버튼 (.btn-secondary) */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-large {
+  padding: 0.85rem 1.8rem;
+  font-size: 1rem;
+}
+
+/* --------------------------------------------------------------------------
+   [10. 게임 조작 안내 가이드 카드]
+   -------------------------------------------------------------------------- */
+.guide-overlay {
+  position: absolute;
+  bottom: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: 90%;
+  max-width: 680px;
+  animation: slide-up 0.5s var(--ease-smooth);
+}
+
+.guide-overlay.hidden {
+  display: none;
+}
+
+.guide-card {
+  background: rgba(8, 20, 38, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--ice-cyan);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), var(--neon-glow-cyan);
+  padding: 1.25rem 1.5rem;
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.guide-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ice-cyan);
+}
+
+.guide-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: all var(--duration-fast);
+}
+
+.guide-close-btn:hover {
+  color: var(--text-white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.guide-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.guide-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--ice-cyan);
+  color: var(--deep-ocean);
+  font-weight: 800;
+  font-size: 0.8rem;
+  border-radius: 50%;
+}
+
+.guide-step p {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.guide-step p strong {
+  color: var(--text-white);
+}
+
+.step-num-divider {
+  width: 1px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 0.5rem;
+}
+
+.guide-footer {
+  margin-top: 0.85rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guide-tip {
+  font-size: 0.75rem;
+  color: var(--neon-mint);
+  line-height: 1.4;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   [11. 게임 결과 모달 (지구 환경 수호자 인증 성적표)]
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 10, 22, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.modal-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  background: linear-gradient(165deg, rgba(14, 34, 61, 0.95) 0%, rgba(6, 17, 33, 0.98) 100%);
+  border: 1.5px solid var(--ice-cyan);
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), var(--neon-glow-cyan);
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: modal-pop 0.45s var(--ease-bounce);
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 모달 상단 엠블럼 */
+.modal-emblem-box {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: -4rem auto 0;
+  width: 5.5rem;
+  height: 5.5rem;
+  background: radial-gradient(circle, #103058 0%, #06152a 100%);
+  border: 2px solid var(--ice-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+}
+
+.modal-emblem {
+  font-size: 2.75rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.8));
+}
+
+.modal-rank-badge {
+  position: absolute;
+  bottom: -0.5rem;
+  background: linear-gradient(90deg, #ffaa00 0%, #ffdd00 100%);
+  color: #050e1a;
+  font-family: var(--font-digital);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 0.15rem 0.65rem;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.05em;
+}
+
+/* 모달 타이틀 */
+.modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.modal-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-white);
+  letter-spacing: -0.02em;
+}
+
+.modal-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* 성적표 4분할 그리드 */
+.modal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
+
+.stat-box {
+  background: rgba(10, 25, 47, 0.7);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  border-radius: 16px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.stat-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.stat-highlight {
+  font-family: var(--font-digital);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--neon-mint);
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+.stat-unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-text-status,
+.stat-text-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ice-cyan);
+}
+
+/* 교육 메시지 박스 */
+.modal-message-box {
+  background: rgba(0, 242, 254, 0.08);
+  border-left: 3px solid var(--ice-cyan);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  text-align: left;
+}
+
+.modal-educate-message {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #d8e8f8;
+}
+
+/* 모달 액션 버튼 그룹 */
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* --------------------------------------------------------------------------
+   [12. 반응형 미디어 쿼리 (반응형 최적화)]
+   - M2 Mac, iPad, Windows 11 PC 및 교실 대형 프로젝터 대응
+   -------------------------------------------------------------------------- */
+
+/* 태블릿 및 작은 모니터 화면 (가로폭 1024px 이하) */
+@media (max-width: 1024px) {
+  .hud-top {
+    gap: 0.85rem;
+  }
+  
+  .glacier-status-container {
+    max-width: 360px;
+  }
+
+  .btn-text {
+    font-size: 0.8rem;
+  }
+}
+
+/* 아이패드 세로 모드 및 스마트폰 화면 (가로폭 768px 이하) */
+@media (max-width: 768px) {
+  .ui-layer {
+    padding: 0.85rem;
+  }
+
+  .hud-top {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  /* 모바일에서는 로고를 작게 유지 */
+  .brand-group {
+    order: 1;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .brand-badge {
+    display: none;
+  }
+
+  .metrics-group {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .metric-card {
+    min-width: auto;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .digital-number {
+    font-size: 1.35rem;
+  }
+
+  /* 빙하 게이지를 헤더 두 번째 줄 전체로 확장 */
+  .glacier-status-container {
+    order: 3;
+    max-width: 100%;
+    width: 100%;
+    padding: 0.5rem 0.85rem;
+  }
+
+  /* 하단 툴바 레이아웃 정렬 */
+  .toolbar-bottom {
+    flex-wrap: wrap;
+    padding: 0.65rem 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .camera-select-group {
+    width: 100%;
+  }
+
+  .styled-select {
+    width: 100%;
+  }
+
+  .button-actions-group {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .guide-overlay {
+    bottom: 8.5rem;
+  }
+
+  .guide-body {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .step-num-divider {
+    display: none;
+  }
+
+  .modal-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 대형 교실 프로젝터 및 4K 화면 (가로폭 1920px 이상) */
+@media (min-width: 1920px) {
+  .brand-title {
+    font-size: 1.25rem;
+  }
+
+  .glacier-status-container {
+    max-width: 600px;
+    padding: 0.85rem 1.6rem;
+  }
+
+  .health-track {
+    height: 16px;
+  }
+
+  .digital-number {
+    font-size: 2.1rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 0.85rem 1.5rem;
+  }
+}
