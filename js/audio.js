@@ -45,19 +45,26 @@ export class SoundEngine {
    */
 
   /**
-   * 화면 클릭, 터치, 키보드 입력 등 첫 인터랙션 시 오디오 컨텍스트를 즉시 활성화합니다.
+   * 화면 클릭, 터치, 키보드 입력 등 첫 인터랙션 시 호출되어 오디오 컨텍스트를 즉시 활성화합니다.
+   * @private
+   */
+  _handleFirstUserGesture() {
+    this.init();
+    // 한 번 활성화된 후에는 이벤트 리스너를 깨끗하게 제거하여 메모리 누수를 방지합니다.
+    const gestureEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
+    gestureEvents.forEach(evt => {
+      document.removeEventListener(evt, this._handleFirstUserGesture);
+    });
+  }
+
+  /**
+   * 사용자의 첫 입력(클릭, 터치 등)을 감지하기 위한 이벤트 리스너를 등록합니다.
    * @private
    */
   _attachGestureListeners() {
     const gestureEvents = ['click', 'touchstart', 'keydown', 'mousedown'];
-    const handler = () => {
-      this.init();
-      // 한 번 활성화된 후에는 이벤트 리스너를 깨끗하게 제거합니다.
-      gestureEvents.forEach(evt => document.removeEventListener(evt, handler));
-    };
-
     gestureEvents.forEach(evt => {
-      document.addEventListener(evt, handler, { once: true, passive: true });
+      document.addEventListener(evt, this._handleFirstUserGesture, { once: true, passive: true });
     });
   }
 
