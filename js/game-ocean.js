@@ -11,7 +11,7 @@
  *    - 플라스틱 컵/빨대(🥤), 페트병(🧴), 비닐봉지(🛍️), 찌그러진 캔(🥫), 폐그물(🪢)
  * 3. 스페셜 아이템 & 장애물:
  *    - 맑은 산소 방울(🫧), 진주 조개(🦪): 바다 청정도 대폭 회복!
- *    - 검은 기름 드럼통(🛢️): 닿으면 화면 흔들림 및 바다 오염 폭탄!
+ *    - 바다청소로봇(🤖): 바다를 스스로 정화하는 청소로봇! 건드려 방해하면 고장나서 화면 흔들림 및 바다 청정도 -25% 대폭 하락!
  * 4. 🌟 거울 모드 텍스트 반전 자동 역보정 (글자가 뒤집히지 않고 항상 정방향 유지)
  * 5. 3배 대형 바다거북이(🐢) 실시간 5대 감정 동기화:
  *    - dancing(춤추기), cheering(응원), worried(당황), crying(울음), superhero(영웅)
@@ -50,8 +50,9 @@ export class OceanGameEngine {
         spawnIntervalMs: 1350,   // 쓰레기가 느리게 하나씩 나옴
         minSpeed: 1.1,           // 아주 천천히 떠다님
         maxSpeed: 1.7,
-        sizeScale: 1.5,          // 초등 1학년 맞춤형 왕 크기 (지름 ~160px)
-        oilChance: 0.0,          // 1단계에는 위험한 기름통이 전혀 없음!
+        sizeScale: 1.5,          // 초등 1학년 맞춤형 왕 크기 (70% 최적화 적용)
+        robotChance: 0.0,        // 1단계에는 청소로봇이 없음 (안심 수거)
+        oilChance: 0.0,
         oxygenChance: 0.22,      // 넉넉한 산소 방울 선물 (22%)
         damageMultiplier: 0.7    // 바닥에 떨어져도 피해가 적음
       },
@@ -61,7 +62,8 @@ export class OceanGameEngine {
         minSpeed: 1.5,
         maxSpeed: 2.3,
         sizeScale: 1.35,
-        oilChance: 0.05,         // 가끔 주의 환기용 기름통 (5%)
+        robotChance: 0.05,       // 가끔 등장하는 바다청소로봇 (건드리면 고장! 주의 5%)
+        oilChance: 0.05,
         oxygenChance: 0.18,
         damageMultiplier: 0.85
       },
@@ -71,6 +73,7 @@ export class OceanGameEngine {
         minSpeed: 2.0,
         maxSpeed: 3.1,
         sizeScale: 1.2,
+        robotChance: 0.10,       // 청소로봇 10%
         oilChance: 0.10,
         oxygenChance: 0.15,
         damageMultiplier: 1.0
@@ -81,6 +84,7 @@ export class OceanGameEngine {
         minSpeed: 2.6,
         maxSpeed: 4.0,
         sizeScale: 1.1,
+        robotChance: 0.14,       // 청소로봇 14%
         oilChance: 0.14,
         oxygenChance: 0.12,
         damageMultiplier: 1.2
@@ -91,6 +95,7 @@ export class OceanGameEngine {
         minSpeed: 3.2,
         maxSpeed: 5.2,
         sizeScale: 1.0,
+        robotChance: 0.18,       // 청소로봇 18%
         oilChance: 0.18,
         oxygenChance: 0.10,
         damageMultiplier: 1.4
@@ -118,7 +123,7 @@ export class OceanGameEngine {
     // ------------------------------------------------------------------------
     // [5. 화면 연출 효과]
     // ------------------------------------------------------------------------
-    this.screenShakeTime = 0;             // 기름통 폭발 시 화면 흔들림 잔여 시간
+    this.screenShakeTime = 0;             // 청소로봇 충돌/고장 시 화면 흔들림 잔여 시간
     this.screenShakeIntensity = 0;
 
     // ------------------------------------------------------------------------
@@ -363,15 +368,17 @@ export class OceanGameEngine {
     let baseDamage = 4;
     let color = '#00f2fe';
 
-    if (rand < config.oilChance) {
-      // 🛢️ 유독 폐수/기름 드럼통 폭탄
-      type = 'OIL';
-      label = '기름통 ☠️';
-      icon = '🛢️';
+    const robotChance = config.robotChance !== undefined ? config.robotChance : (config.oilChance || 0);
+
+    if (rand < robotChance) {
+      // 🤖 바다를 스스로 정화 중인 바다청소로봇 (건드리면 방해되어 고장 발생!)
+      type = 'ROBOT';
+      label = '바다청소로봇 🤖';
+      icon = '🤖';
       points = 0;
-      baseDamage = 25;
-      color = '#ff3366';
-    } else if (rand < config.oilChance + config.oxygenChance) {
+      baseDamage = 25; // 건드리면 고장나며 청정도 -25% 대폭 하락
+      color = '#ff9f1c'; // 주의를 환기하는 밝은 오렌지 네온 로봇 컬러
+    } else if (rand < robotChance + config.oxygenChance) {
       // 🫧 산소 방울 회복 아이템
       type = 'OXYGEN';
       label = '산소방울 🫧';
@@ -397,8 +404,8 @@ export class OceanGameEngine {
       color = selected.color;
     }
 
-    // 기본 반경: 초등 1학년 맞춤 크기 (반경 60~90px)
-    const baseRadius = (60 + Math.random() * 25) * config.sizeScale;
+    // 🌟 기본 반경: 전체적으로 70% 최적화 적용 (기존 60~85px -> 약 42~60px)
+    const baseRadius = (60 + Math.random() * 25) * config.sizeScale * 0.7;
     const speed = (config.minSpeed + Math.random() * (config.maxSpeed - config.minSpeed));
 
     // 화면 상단 무작위 X 좌표
@@ -462,17 +469,17 @@ export class OceanGameEngine {
    * 쓰레기 또는 아이템 수거 이벤트 처리
    */
   handleObjectCollected(obj) {
-    if (obj.type === 'OIL') {
-      // 🛢️ 기름통 터치: 오염 폭탄 폭발!
+    if (obj.type === 'ROBOT' || obj.type === 'OIL') {
+      // 🤖 바다청소로봇 터치: 청소 방해로 로봇 오작동/고장 발생! 바다 청정도 -25% 대폭 하락
       this.oceanHealth = Math.max(0, this.oceanHealth - obj.damage);
       this.triggerScreenShake(450, 16);
-      this.createExplosionParticles(obj.x, obj.y, '#333333', 35);
-      this.updateTurtleMood('worried', '으악! 기름통이 터졌어! 바다가 아파해 💦');
+      this.createExplosionParticles(obj.x, obj.y, '#ff9f1c', 35);
+      this.updateTurtleMood('worried', '앗! 청소로봇을 건드려 고장 났어! 조심해 🤖💦');
 
       if (this.soundEngine) {
         this.soundEngine.playExplosion();
       }
-      this.showNotification('⚠️ 위험! 기름통을 건드려 바다가 오염되었습니다!', '🛢️', 2000);
+      this.showNotification('⚠️ 주의! 바다청소로봇을 방해하여 고장 났습니다! (-25%)', '🤖', 2000);
     } else if (obj.type === 'OXYGEN') {
       // 🫧 산소 방울 터치: 바다 청정도 회복!
       this.oceanHealth = Math.min(100, this.oceanHealth + Math.abs(obj.damage));
@@ -563,7 +570,7 @@ export class OceanGameEngine {
   }
 
   /**
-   * 기름통 폭발 시 검붉은 연기/파편 파티클
+   * 바다청소로봇 충돌/고장 시 전기 스파크 및 주황/노랑 파편 파티클
    */
   createExplosionParticles(x, y, color, count = 30) {
     for (let i = 0; i < count; i++) {
@@ -575,7 +582,7 @@ export class OceanGameEngine {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         radius: 5 + Math.random() * 9,
-        color: Math.random() > 0.5 ? '#ff3366' : '#222222',
+        color: Math.random() > 0.5 ? (color || '#ff9f1c') : '#ffd166',
         alpha: 1,
         life: 0.7 + Math.random() * 0.5
       });
@@ -703,7 +710,7 @@ export class OceanGameEngine {
 
         // 바닥 해저면에 닿았을 때
         if (obj.y + obj.radius >= bottomOceanFloor) {
-          if (obj.type !== 'OIL' && obj.type !== 'OXYGEN') {
+          if (obj.type !== 'ROBOT' && obj.type !== 'OIL' && obj.type !== 'OXYGEN') {
             // 바다 청정도 감소
             this.oceanHealth = Math.max(0, this.oceanHealth - obj.damage);
             this.updateHUD();

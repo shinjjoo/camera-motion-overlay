@@ -118,7 +118,7 @@ export const BUBBLE_TYPES = {
     subLabel: '+10kg',
     kidName: '나쁜 가스',
     kidDesc: '+10 점수',
-    radius: 124,             // 🌟 2배 초대형 왕방울! (기존 62px -> 124px, 지름 248px)
+    radius: 87,              // 🌟 70% 크기 최적화 (지름 174px)
     score: 10,               // 터뜨렸을 때 얻는 탄소 감축량 (+10kg)
     damage: 5,               // 바닥 빙하에 닿았을 때 빙하 손상도 (-5%)
     heal: 0,
@@ -137,7 +137,7 @@ export const BUBBLE_TYPES = {
     subLabel: '+25kg',
     kidName: '초록 가스',
     kidDesc: '+25 고득점!',
-    radius: 132,             // 🌟 2배 초대형 왕방울! (기존 66px -> 132px, 지름 264px)
+    radius: 92,              // 🌟 70% 크기 최적화 (지름 184px)
     score: 25,               // 터뜨렸을 때 얻는 탄소 감축량 (+25kg)
     damage: 7,               // 바닥 빙하에 닿았을 때 빙하 손상도 (-7%)
     heal: 0,
@@ -156,7 +156,7 @@ export const BUBBLE_TYPES = {
     subLabel: '+15%',
     kidName: '얼음 보석',
     kidDesc: '빙하 +15% 회복!',
-    radius: 120,             // 🌟 2배 초대형 왕방울! (기존 60px -> 120px, 지름 240px)
+    radius: 84,              // 🌟 70% 크기 최적화 (지름 168px)
     score: 0,
     damage: 0,
     heal: 15,                // 손끝으로 터치 시 빙하 체력 회복 (+15%)
@@ -175,7 +175,7 @@ export const BUBBLE_TYPES = {
     subLabel: '-25% 위험!',
     kidName: '위험 폭탄!',
     kidDesc: '만지면 안 돼요!',
-    radius: 136,             // 🌟 2배 초대형 왕방울! (기존 68px -> 136px, 지름 272px)
+    radius: 95,              // 🌟 70% 크기 최적화 (지름 190px)
     score: 0,
     damage: 25,              // 건드리면 즉시 폭발하여 빙하 체력 대폭 감소 (-25%)
     heal: 0,
@@ -1547,56 +1547,56 @@ export class GameEngine {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // (A) 상단: 크고 선명한 이모지 아이콘 (☁️, 🫧, ❄️, ☠️)
-      ctx.font = '60px "Noto Sans KR", sans-serif';
+      // (A) 상단: 크고 선명한 이모지 아이콘 (70% 최적화: 42px)
+      ctx.font = '42px "Noto Sans KR", sans-serif';
       ctx.fillText(b.icon || '✨', 0, -currentRadius * 0.36);
 
       // (B) 중앙 및 하단 라벨 (가스 vs 눈꽃 vs 폭탄)
       if (b.type === 'CO2' || b.type === 'CH4') {
-        // 중앙: 매우 굵고 선명한 가스 기호 (CO₂, CH₄)
-        ctx.font = '900 58px "Rajdhani", "Noto Sans KR", sans-serif';
+        // 중앙: 매우 굵고 선명한 가스 기호 (70% 최적화: 40px)
+        ctx.font = '900 40px "Rajdhani", "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.lineWidth = 6.0;
+        ctx.lineWidth = 4.2;
         ctx.strokeText(b.label, 0, 4);
         ctx.fillText(b.label, 0, 4);
 
-        // 하단: 초등 1학년용 쉬운 한글 뱃지 ("나쁜 가스 +10", "초록 가스 +25")
-        ctx.font = '800 24px "Noto Sans KR", sans-serif';
+        // 하단: 초등 1학년용 쉬운 한글 뱃지 (70% 최적화: 17px)
+        ctx.font = '800 17px "Noto Sans KR", sans-serif';
         ctx.fillStyle = b.type === 'CH4' ? '#86efac' : '#fef08a';
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.lineWidth = 5.0;
+        ctx.lineWidth = 3.5;
         const kidText = `${b.kidName || b.name} ${b.subLabel}`;
         ctx.strokeText(kidText, 0, currentRadius * 0.44);
         ctx.fillText(kidText, 0, currentRadius * 0.44);
       } else if (b.type === 'ICE') {
-        // 눈꽃 회복 결정
-        ctx.font = '900 34px "Noto Sans KR", sans-serif';
+        // 눈꽃 회복 결정 (70% 최적화: 24px / 17px)
+        ctx.font = '900 24px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#0284c7';
-        ctx.lineWidth = 5.5;
+        ctx.lineWidth = 3.8;
         ctx.strokeText('얼음 회복! ❄️', 0, 4);
         ctx.fillText('얼음 회복! ❄️', 0, 4);
 
-        ctx.font = '800 24px "Noto Sans KR", sans-serif';
+        ctx.font = '800 17px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#7dd3fc';
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.lineWidth = 4.5;
+        ctx.lineWidth = 3.2;
         ctx.strokeText('+15% 체력 충전', 0, currentRadius * 0.45);
         ctx.fillText('+15% 체력 충전', 0, currentRadius * 0.45);
       } else if (b.type === 'BOMB') {
-        // 유독 매연 폭탄
-        ctx.font = '900 34px "Noto Sans KR", sans-serif';
+        // 유독 매연 폭탄 (70% 최적화: 24px / 15px)
+        ctx.font = '900 24px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#fee2e2';
         ctx.strokeStyle = '#991b1b';
-        ctx.lineWidth = 5.5;
+        ctx.lineWidth = 3.8;
         ctx.strokeText('위험! 피해요! ⚠️', 0, 4);
         ctx.fillText('위험! 피해요! ⚠️', 0, 4);
 
-        ctx.font = '800 22px "Noto Sans KR", sans-serif';
+        ctx.font = '800 15px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#fca5a5';
         ctx.strokeStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.lineWidth = 4.5;
+        ctx.lineWidth = 3.2;
         ctx.strokeText('닿으면 쾅! 빙하 파괴', 0, currentRadius * 0.45);
         ctx.fillText('닿으면 쾅! 빙하 파괴', 0, currentRadius * 0.45);
       }
