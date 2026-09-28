@@ -384,13 +384,13 @@ export class OceanGameEngine {
     const robotChance = config.robotChance !== undefined ? config.robotChance : (config.oilChance || 0);
 
     if (rand < robotChance) {
-      // 🤖 바다를 스스로 정화 중인 바다청소로봇 (건드리면 방해되어 고장 발생!)
+      // 🤖 바다를 스스로 정화 중인 바다청소로봇 (🚨 빨간색 주의 비누방울: 건드리면 고장!)
       type = 'ROBOT';
-      label = '바다청소로봇 🤖';
+      label = '청소로봇 🤖';
       icon = '🤖';
       points = 0;
       baseDamage = 25; // 건드리면 고장나며 청정도 -25% 대폭 하락
-      color = '#ff9f1c'; // 주의를 환기하는 밝은 오렌지 네온 로봇 컬러
+      color = '#ff3344'; // 🚨 건드리면 안 되는 주의 장애물: 선명한 빨간색 네온 비누방울
       baseRadius = 95;   // 북극 폭탄과 동일한 기본 반경
     } else if (rand < robotChance + config.oxygenChance) {
       // 🫧 산소 방울 회복 아이템
@@ -495,13 +495,13 @@ export class OceanGameEngine {
       // 🤖 바다청소로봇 터치: 청소 방해로 로봇 오작동/고장 발생! 바다 청정도 -25% 대폭 하락
       this.oceanHealth = Math.max(0, this.oceanHealth - obj.damage);
       this.triggerScreenShake(450, 16);
-      this.createExplosionParticles(obj.x, obj.y, '#ff9f1c', 35);
-      this.updateTurtleMood('worried', '앗! 청소로봇을 건드려 고장 났어! 조심해 🤖💦');
+      this.createExplosionParticles(obj.x, obj.y, '#ff3344', 35); // 🚨 빨간색 폭발 스파크 파티클
+      this.updateTurtleMood('worried', '앗! 빨간 청소로봇을 건드려 고장 났어! 조심해 🤖💦');
 
       if (this.soundEngine) {
         this.soundEngine.playExplosion();
       }
-      this.showNotification('⚠️ 주의! 바다청소로봇을 방해하여 고장 났습니다! (-25%)', '🤖', 2000);
+      this.showNotification('🚨 주의! 빨간색 청소로봇을 방해하여 고장 났습니다! (-25%)', '🤖', 2000);
     } else if (obj.type === 'OXYGEN') {
       // 🫧 산소 방울 터치: 바다 청정도 회복!
       this.oceanHealth = Math.min(100, this.oceanHealth + Math.abs(obj.damage));
@@ -592,7 +592,7 @@ export class OceanGameEngine {
   }
 
   /**
-   * 바다청소로봇 충돌/고장 시 전기 스파크 및 주황/노랑 파편 파티클
+   * 바다청소로봇 충돌/고장 시 빨간색 전기 스파크 파편 파티클
    */
   createExplosionParticles(x, y, color, count = 30) {
     for (let i = 0; i < count; i++) {
@@ -604,7 +604,7 @@ export class OceanGameEngine {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         radius: 5 + Math.random() * 9,
-        color: Math.random() > 0.5 ? (color || '#ff9f1c') : '#ffd166',
+        color: Math.random() > 0.5 ? (color || '#ff3344') : '#ff6b6b',
         alpha: 1,
         life: 0.7 + Math.random() * 0.5
       });
@@ -771,11 +771,11 @@ export class OceanGameEngine {
 
     ctx.save();
 
-    // 1. 방울 외곽 발광 효과
+    // 1. 방울 외곽 발광 효과 (로봇 방울은 빨간색 네온 글로우를 더욱 강렬하게!)
     ctx.shadowColor = obj.color;
-    ctx.shadowBlur = 20;
+    ctx.shadowBlur = obj.type === 'ROBOT' ? 28 : 20;
 
-    // 2. 반투명 버블 구체 배경
+    // 2. 반투명 버블 구체 배경 (빨간색 로봇 방울은 내부도 붉은 입체 틴트)
     const grad = ctx.createRadialGradient(
       obj.x - obj.radius * 0.3,
       obj.y - obj.radius * 0.3,
@@ -784,19 +784,19 @@ export class OceanGameEngine {
       obj.y,
       obj.radius
     );
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
-    grad.addColorStop(0.35, `${obj.color}66`);
-    grad.addColorStop(0.85, `${obj.color}22`);
-    grad.addColorStop(1, `${obj.color}99`);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+    grad.addColorStop(0.35, obj.type === 'ROBOT' ? 'rgba(255, 51, 68, 0.65)' : `${obj.color}66`);
+    grad.addColorStop(0.85, obj.type === 'ROBOT' ? 'rgba(255, 20, 50, 0.35)' : `${obj.color}22`);
+    grad.addColorStop(1, obj.type === 'ROBOT' ? 'rgba(230, 0, 40, 0.90)' : `${obj.color}99`);
 
     ctx.beginPath();
     ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // 3. 버블 테두리 선
-    ctx.strokeStyle = obj.color;
-    ctx.lineWidth = 3.5;
+    // 3. 버블 테두리 선 (로봇 방울은 조금 더 두껍고 강렬한 빨간색)
+    ctx.strokeStyle = obj.type === 'ROBOT' ? '#ff1e38' : obj.color;
+    ctx.lineWidth = obj.type === 'ROBOT' ? 4.5 : 3.5;
     ctx.stroke();
 
     // 4. 버블 상단 하이라이트 광택
@@ -826,9 +826,9 @@ export class OceanGameEngine {
 
     // (B) 하단 텍스트 라벨 (선명한 한글 이름)
     ctx.font = `900 ${Math.round(obj.radius * 0.28)}px 'Noto Sans KR', sans-serif`;
-    ctx.fillStyle = '#ffffff';
-    ctx.strokeStyle = 'rgba(2, 26, 54, 0.95)';
-    ctx.lineWidth = 4;
+    ctx.fillStyle = obj.type === 'ROBOT' ? '#ffebee' : '#ffffff';
+    ctx.strokeStyle = obj.type === 'ROBOT' ? '#7f0000' : 'rgba(2, 26, 54, 0.95)';
+    ctx.lineWidth = 4.5;
     ctx.strokeText(obj.label, 0, obj.radius * 0.52);
     ctx.fillText(obj.label, 0, obj.radius * 0.52);
 
