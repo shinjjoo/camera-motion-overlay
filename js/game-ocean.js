@@ -47,10 +47,11 @@ export class OceanGameEngine {
     this.LEVEL_CONFIGS = {
       1: {
         levelName: '새싹 바다 수호자 🐣',
-        spawnIntervalMs: 1350,   // 쓰레기가 느리게 하나씩 나옴
-        minSpeed: 1.1,           // 아주 천천히 떠다님
-        maxSpeed: 1.7,
-        sizeScale: 1.5,          // 초등 1학년 맞춤형 왕 크기 (70% 최적화 적용)
+        spawnIntervalMs: 2200,   // 🌟 북극과 동일: 2.2초마다 1개씩 여유롭게 생성
+        maxBubbles: 4,           // 🌟 북극과 동일: 화면 내 최대 4개만 유지! (방울 과다 방지)
+        speedMultiplier: 0.65,   // 🌟 북극과 동일: 속도 매우 느림 (0.65배, 약 0.91~1.43px)
+        bubbleScale: 1.25,       // 🌟 북극과 동일: 1단계에서는 방울 크기가 1.25배 더 왕 커짐!
+        sizeScale: 1.25,         // 호환용
         robotChance: 0.0,        // 1단계에는 청소로봇이 없음 (안심 수거)
         oilChance: 0.0,
         oxygenChance: 0.22,      // 넉넉한 산소 방울 선물 (22%)
@@ -58,10 +59,11 @@ export class OceanGameEngine {
       },
       2: {
         levelName: '초보 바다 친구 🐠',
-        spawnIntervalMs: 1100,
-        minSpeed: 1.5,
-        maxSpeed: 2.3,
-        sizeScale: 1.35,
+        spawnIntervalMs: 1800,   // 🌟 북극과 동일: 1.8초마다 1개 생성
+        maxBubbles: 5,           // 🌟 북극과 동일: 화면에 최대 5개 유지
+        speedMultiplier: 0.85,   // 🌟 북극과 동일: 속도 느림 (약 1.19~1.87px)
+        bubbleScale: 1.15,       // 🌟 북극과 동일: 1.15배 크기
+        sizeScale: 1.15,
         robotChance: 0.05,       // 가끔 등장하는 바다청소로봇 (건드리면 고장! 주의 5%)
         oilChance: 0.05,
         oxygenChance: 0.18,
@@ -69,10 +71,11 @@ export class OceanGameEngine {
       },
       3: {
         levelName: '푸른 파도 지킴이 🌊',
-        spawnIntervalMs: 880,
-        minSpeed: 2.0,
-        maxSpeed: 3.1,
-        sizeScale: 1.2,
+        spawnIntervalMs: 1400,   // 🌟 북극과 동일: 1.4초마다 1개 생성
+        maxBubbles: 7,           // 🌟 북극과 동일: 화면에 최대 7개 유지
+        speedMultiplier: 1.05,   // 🌟 북극과 동일: 보통 속도 (약 1.47~2.31px)
+        bubbleScale: 1.05,       // 🌟 북극과 동일: 1.05배 크기
+        sizeScale: 1.05,
         robotChance: 0.10,       // 청소로봇 10%
         oilChance: 0.10,
         oxygenChance: 0.15,
@@ -80,10 +83,11 @@ export class OceanGameEngine {
       },
       4: {
         levelName: '해양 생태 수호자 🐬',
-        spawnIntervalMs: 700,
-        minSpeed: 2.6,
-        maxSpeed: 4.0,
-        sizeScale: 1.1,
+        spawnIntervalMs: 1100,   // 🌟 북극과 동일: 1.1초마다 1~2개 생성
+        maxBubbles: 9,           // 🌟 북극과 동일: 화면에 최대 9개 유지
+        speedMultiplier: 1.35,   // 🌟 북극과 동일: 약간 빠름 (약 1.89~2.97px)
+        bubbleScale: 1.0,        // 🌟 북극과 동일: 기본 크기 (1.0배)
+        sizeScale: 1.0,
         robotChance: 0.14,       // 청소로봇 14%
         oilChance: 0.14,
         oxygenChance: 0.12,
@@ -91,10 +95,11 @@ export class OceanGameEngine {
       },
       5: {
         levelName: '지구 바다의 영웅 👑',
-        spawnIntervalMs: 530,    // 쏟아지는 바다쓰레기
-        minSpeed: 3.2,
-        maxSpeed: 5.2,
-        sizeScale: 1.0,
+        spawnIntervalMs: 800,    // 🌟 북극과 동일: 0.8초마다 빠르게 생성
+        maxBubbles: 12,          // 🌟 북극과 동일: 최대 12개 유지
+        speedMultiplier: 1.7,    // 🌟 북극과 동일: 스릴 만점 빠른 속도 (약 2.38~3.74px)
+        bubbleScale: 0.95,       // 🌟 북극과 동일: 0.95배
+        sizeScale: 0.95,
         robotChance: 0.18,       // 청소로봇 18%
         oilChance: 0.18,
         oxygenChance: 0.10,
@@ -356,9 +361,16 @@ export class OceanGameEngine {
 
   /**
    * 새로운 바다쓰레기 또는 아이템을 스폰합니다.
+   * 🌟 북극 빙하 지킴이와 100% 동일한 방울 수 제한, 크기 배율, 하강 스피드를 적용합니다!
    */
   spawnTrashObject(timestamp) {
     const config = this.LEVEL_CONFIGS[this.currentLevel] || this.LEVEL_CONFIGS[1];
+
+    // 🌟 1. [방울 수 제어] 화면 내 최대 허용 방울 수 초과 시 스폰 차단 (아이들 혼란 및 방울 과다 완벽 방지!)
+    if (this.trashObjects.length >= (config.maxBubbles || 5)) {
+      return;
+    }
+
     const rand = Math.random();
 
     let type = 'CUP';
@@ -367,6 +379,7 @@ export class OceanGameEngine {
     let points = 10;
     let baseDamage = 4;
     let color = '#00f2fe';
+    let baseRadius = 87; // 북극 CO2와 동일한 기본 반경
 
     const robotChance = config.robotChance !== undefined ? config.robotChance : (config.oilChance || 0);
 
@@ -378,6 +391,7 @@ export class OceanGameEngine {
       points = 0;
       baseDamage = 25; // 건드리면 고장나며 청정도 -25% 대폭 하락
       color = '#ff9f1c'; // 주의를 환기하는 밝은 오렌지 네온 로봇 컬러
+      baseRadius = 95;   // 북극 폭탄과 동일한 기본 반경
     } else if (rand < robotChance + config.oxygenChance) {
       // 🫧 산소 방울 회복 아이템
       type = 'OXYGEN';
@@ -386,14 +400,15 @@ export class OceanGameEngine {
       points = 0;
       baseDamage = -15; // 체력 회복
       color = '#00f5d4';
+      baseRadius = 84;   // 북극 얼음보석과 동일한 기본 반경
     } else {
       // 일반 해양 쓰레기 5종 무작위
       const trashTypes = [
-        { type: 'CUP', label: '플라스틱 컵', icon: '🥤', points: 10, damage: 4, color: '#00f2fe' },
-        { type: 'BOTTLE', label: '페트병', icon: '🧴', points: 15, damage: 6, color: '#4facfe' },
-        { type: 'BAG', label: '비닐봉지', icon: '🛍️', points: 20, damage: 7, color: '#b388ff' },
-        { type: 'CAN', label: '찌그러진 캔', icon: '🥫', points: 25, damage: 8, color: '#ffb703' },
-        { type: 'NET', label: '위험한 폐그물', icon: '🪢', points: 50, damage: 15, color: '#fb8500' }
+        { type: 'CUP', label: '플라스틱 컵', icon: '🥤', points: 10, damage: 4, color: '#00f2fe', radius: 87 },
+        { type: 'BOTTLE', label: '페트병', icon: '🧴', points: 15, damage: 6, color: '#4facfe', radius: 90 },
+        { type: 'BAG', label: '비닐봉지', icon: '🛍️', points: 20, damage: 7, color: '#b388ff', radius: 88 },
+        { type: 'CAN', label: '찌그러진 캔', icon: '🥫', points: 25, damage: 8, color: '#ffb703', radius: 86 },
+        { type: 'NET', label: '위험한 폐그물', icon: '🪢', points: 50, damage: 15, color: '#fb8500', radius: 92 }
       ];
       const selected = trashTypes[Math.floor(Math.random() * trashTypes.length)];
       type = selected.type;
@@ -402,16 +417,23 @@ export class OceanGameEngine {
       points = selected.points;
       baseDamage = selected.damage;
       color = selected.color;
+      baseRadius = selected.radius;
     }
 
-    // 🌟 기본 반경: 전체적으로 70% 최적화 적용 (기존 60~85px -> 약 42~60px)
-    const baseRadius = (60 + Math.random() * 25) * config.sizeScale * 0.7;
-    const speed = (config.minSpeed + Math.random() * (config.maxSpeed - config.minSpeed));
+    // 🌟 2. [방울 크기] 북극 빙하 지킴이와 100% 동일하게 레벨별 스케일(bubbleScale) 적용
+    // (1단계: 1.25배 대형 왕방울, 2단계: 1.15배, 3단계: 1.05배, 4단계: 1.0배, 5단계: 0.95배)
+    const scale = config.bubbleScale || config.sizeScale || 1.0;
+    const finalRadius = baseRadius * scale;
+
+    // 🌟 3. [하강 스피드] 북극 빙하 지킴이와 100% 동일한 기본 속도(1.4~2.2) 및 단계별 배율 적용
+    // (1단계: 0.65배로 아주 천천히 하강, 2단계: 0.85배, 3단계: 1.05배, 4단계: 1.35배, 5단계: 1.7배)
+    const baseSpeed = 1.4 + Math.random() * (2.2 - 1.4);
+    const finalSpeed = baseSpeed * (config.speedMultiplier || 1.0);
 
     // 화면 상단 무작위 X 좌표
-    const padding = baseRadius + 40;
+    const padding = finalRadius + 40;
     const x = padding + Math.random() * (Math.max(300, this.canvas.width - padding * 2));
-    const y = -baseRadius - 10;
+    const y = -finalRadius - 10;
 
     this.trashObjects.push({
       id: Math.random().toString(36).substring(2, 9),
@@ -422,8 +444,8 @@ export class OceanGameEngine {
       damage: Math.round(baseDamage * config.damageMultiplier),
       x,
       y,
-      radius: baseRadius,
-      speed,
+      radius: finalRadius,
+      speed: finalSpeed,
       wobbleSpeed: 0.025 + Math.random() * 0.03,
       wobbleAmplitude: 25 + Math.random() * 20,
       wobbleOffset: Math.random() * Math.PI * 2,
@@ -639,9 +661,10 @@ export class OceanGameEngine {
         }
       }
 
-      // 새 쓰레기 오브젝트 스폰
+      // 새 쓰레기 오브젝트 스폰 (북극 빙하 지킴이와 동일한 점진적 간격 단축 적용)
       const config = this.LEVEL_CONFIGS[this.currentLevel] || this.LEVEL_CONFIGS[1];
-      if (timestamp - this.lastSpawnTime >= config.spawnIntervalMs) {
+      const currentInterval = Math.max(650, (config.spawnIntervalMs || 1500) - ((60 - this.remainingTime) * 8));
+      if (timestamp - this.lastSpawnTime >= currentInterval) {
         this.spawnTrashObject(timestamp);
         this.lastSpawnTime = timestamp;
       }
