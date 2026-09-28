@@ -12,9 +12,10 @@
  * 3. 스페셜 아이템 & 장애물:
  *    - 맑은 산소 방울(🫧), 진주 조개(🦪): 바다 청정도 대폭 회복!
  *    - 검은 기름 드럼통(🛢️): 닿으면 화면 흔들림 및 바다 오염 폭탄!
- * 4. 3배 대형 바다거북이(🐢) 실시간 5대 감정 동기화:
+ * 4. 🌟 거울 모드 텍스트 반전 자동 역보정 (글자가 뒤집히지 않고 항상 정방향 유지)
+ * 5. 3배 대형 바다거북이(🐢) 실시간 5대 감정 동기화:
  *    - dancing(춤추기), cheering(응원), worried(당황), crying(울음), superhero(영웅)
- * 5. 바닷속 유영 물리 & 상쾌한 물방울 파티클 시스템
+ * 6. 바닷속 유영 물리 & 상쾌한 물방울 파티클 시스템
  * ============================================================================
  */
 
@@ -49,7 +50,7 @@ export class OceanGameEngine {
         spawnIntervalMs: 1350,   // 쓰레기가 느리게 하나씩 나옴
         minSpeed: 1.1,           // 아주 천천히 떠다님
         maxSpeed: 1.7,
-        sizeScale: 1.45,         // 초등 1학년 맞춤형 왕 크기 (지름 ~160px)
+        sizeScale: 1.5,          // 초등 1학년 맞춤형 왕 크기 (지름 ~160px)
         oilChance: 0.0,          // 1단계에는 위험한 기름통이 전혀 없음!
         oxygenChance: 0.22,      // 넉넉한 산소 방울 선물 (22%)
         damageMultiplier: 0.7    // 바닥에 떨어져도 피해가 적음
@@ -59,7 +60,7 @@ export class OceanGameEngine {
         spawnIntervalMs: 1100,
         minSpeed: 1.5,
         maxSpeed: 2.3,
-        sizeScale: 1.3,
+        sizeScale: 1.35,
         oilChance: 0.05,         // 가끔 주의 환기용 기름통 (5%)
         oxygenChance: 0.18,
         damageMultiplier: 0.85
@@ -69,7 +70,7 @@ export class OceanGameEngine {
         spawnIntervalMs: 880,
         minSpeed: 2.0,
         maxSpeed: 3.1,
-        sizeScale: 1.15,
+        sizeScale: 1.2,
         oilChance: 0.10,
         oxygenChance: 0.15,
         damageMultiplier: 1.0
@@ -79,7 +80,7 @@ export class OceanGameEngine {
         spawnIntervalMs: 700,
         minSpeed: 2.6,
         maxSpeed: 4.0,
-        sizeScale: 1.05,
+        sizeScale: 1.1,
         oilChance: 0.14,
         oxygenChance: 0.12,
         damageMultiplier: 1.2
@@ -137,6 +138,7 @@ export class OceanGameEngine {
    * DOM 엘리먼트들을 미리 찾아서 변수에 저장해 둡니다.
    */
   cacheDomElements() {
+    this.appContainer = document.getElementById('appContainer');
     this.timerDisplay = document.getElementById('timerDisplay');
     this.oceanHealthBar = document.getElementById('oceanHealthBar');
     this.oceanHealthText = document.getElementById('oceanHealthText');
@@ -171,6 +173,14 @@ export class OceanGameEngine {
     this.finalEducateMessage = document.getElementById('finalEducateMessage');
     this.modalRestartBtn = document.getElementById('modalRestartBtn');
     this.modalCloseBtn = document.getElementById('modalCloseBtn');
+  }
+
+  /**
+   * 현재 거울 모드가 켜져 있는지 확인합니다.
+   * @returns {boolean}
+   */
+  isMirrored() {
+    return this.appContainer ? this.appContainer.classList.contains('mirror-active') : true;
   }
 
   /**
@@ -356,7 +366,7 @@ export class OceanGameEngine {
     if (rand < config.oilChance) {
       // 🛢️ 유독 폐수/기름 드럼통 폭탄
       type = 'OIL';
-      label = '기름통';
+      label = '기름통 ☠️';
       icon = '🛢️';
       points = 0;
       baseDamage = 25;
@@ -364,15 +374,15 @@ export class OceanGameEngine {
     } else if (rand < config.oilChance + config.oxygenChance) {
       // 🫧 산소 방울 회복 아이템
       type = 'OXYGEN';
-      label = '산소방울';
+      label = '산소방울 🫧';
       icon = '🫧';
       points = 0;
       baseDamage = -15; // 체력 회복
       color = '#00f5d4';
     } else {
-      // 일반 해양 쓰레기 4종 무작위
+      // 일반 해양 쓰레기 5종 무작위
       const trashTypes = [
-        { type: 'CUP', label: '플라스틱', icon: '🥤', points: 10, damage: 4, color: '#00f2fe' },
+        { type: 'CUP', label: '플라스틱 컵', icon: '🥤', points: 10, damage: 4, color: '#00f2fe' },
         { type: 'BOTTLE', label: '페트병', icon: '🧴', points: 15, damage: 6, color: '#4facfe' },
         { type: 'BAG', label: '비닐봉지', icon: '🛍️', points: 20, damage: 7, color: '#b388ff' },
         { type: 'CAN', label: '찌그러진 캔', icon: '🥫', points: 25, damage: 8, color: '#ffb703' },
@@ -387,8 +397,8 @@ export class OceanGameEngine {
       color = selected.color;
     }
 
-    // 기본 반경: 초등 1학년 맞춤 크기 (반경 55~85px)
-    const baseRadius = (55 + Math.random() * 25) * config.sizeScale;
+    // 기본 반경: 초등 1학년 맞춤 크기 (반경 60~90px)
+    const baseRadius = (60 + Math.random() * 25) * config.sizeScale;
     const speed = (config.minSpeed + Math.random() * (config.maxSpeed - config.minSpeed));
 
     // 화면 상단 무작위 X 좌표
@@ -424,7 +434,7 @@ export class OceanGameEngine {
       return;
     }
 
-    const touchRadius = 35; // 어린이 손끝 판정 여유 반경
+    const touchRadius = 45; // 어린이 손끝 판정 여유 반경
 
     for (let i = this.trashObjects.length - 1; i >= 0; i--) {
       const obj = this.trashObjects[i];
@@ -724,13 +734,16 @@ export class OceanGameEngine {
 
   /**
    * 개별 바다쓰레기 방울을 만화풍의 반투명 원형 버블로 렌더링
+   * 🌟 거울 모드(mirror-active) 상태를 감지하여 텍스트와 이모지를 scale(-1, 1)로 역반전합니다!
    */
   renderTrashBubble(ctx, obj) {
+    const isMirrored = this.isMirrored();
+
     ctx.save();
 
     // 1. 방울 외곽 발광 효과
     ctx.shadowColor = obj.color;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 20;
 
     // 2. 반투명 버블 구체 배경
     const grad = ctx.createRadialGradient(
@@ -741,10 +754,10 @@ export class OceanGameEngine {
       obj.y,
       obj.radius
     );
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
-    grad.addColorStop(0.4, `${obj.color}55`);
-    grad.addColorStop(0.9, `${obj.color}22`);
-    grad.addColorStop(1, `${obj.color}88`);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+    grad.addColorStop(0.35, `${obj.color}66`);
+    grad.addColorStop(0.85, `${obj.color}22`);
+    grad.addColorStop(1, `${obj.color}99`);
 
     ctx.beginPath();
     ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
@@ -762,22 +775,35 @@ export class OceanGameEngine {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.fill();
 
-    // 5. 중앙 큼직한 이모지 아이콘 (1학년 맞춤형 대형 폰트)
+    // ------------------------------------------------------------------------
+    // 🌟 5. [거울 모드 텍스트 & 이모지 반전 보정 렌더링]
+    // 캔버스 전체가 CSS transform: scaleX(-1) 되어 있으므로,
+    // 방울 중심 좌표에서 scale(-1, 1)을 한 번 더 적용하여 글자가 똑바로 보이게 만듭니다!
+    // ------------------------------------------------------------------------
+    ctx.save();
+    ctx.translate(obj.x, obj.y);
+    if (isMirrored) {
+      ctx.scale(-1, 1);
+    }
+
     ctx.shadowBlur = 0;
-    ctx.font = `${Math.round(obj.radius * 0.95)}px sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(obj.icon, obj.x, obj.y - obj.radius * 0.12);
 
-    // 6. 하단 텍스트 라벨 (선명한 한글 이름)
-    ctx.font = `bold ${Math.round(obj.radius * 0.32)}px 'Noto Sans KR', sans-serif`;
+    // (A) 중앙 큼직한 이모지 아이콘 (1학년 맞춤형 대형 폰트)
+    ctx.font = `${Math.round(obj.radius * 0.88)}px sans-serif`;
+    ctx.fillText(obj.icon, 0, -obj.radius * 0.15);
+
+    // (B) 하단 텍스트 라벨 (선명한 한글 이름)
+    ctx.font = `900 ${Math.round(obj.radius * 0.28)}px 'Noto Sans KR', sans-serif`;
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = 'rgba(2, 26, 54, 0.95)';
     ctx.lineWidth = 4;
-    ctx.strokeText(obj.label, obj.x, obj.y + obj.radius * 0.55);
-    ctx.fillText(obj.label, obj.x, obj.y + obj.radius * 0.55);
+    ctx.strokeText(obj.label, 0, obj.radius * 0.52);
+    ctx.fillText(obj.label, 0, obj.radius * 0.52);
 
-    ctx.restore();
+    ctx.restore(); // 텍스트 역반전 복원
+    ctx.restore(); // 방울 상태 복원
   }
 
   /**
@@ -819,22 +845,22 @@ export class OceanGameEngine {
 
       // 바깥쪽 펄스 링
       const pulse = 1 + Math.sin(timestamp * 0.008) * 0.2;
-      const ringRadius = 26 * pulse;
+      const ringRadius = 28 * pulse;
 
       ctx.beginPath();
       ctx.arc(pt.x, pt.y, ringRadius, 0, Math.PI * 2);
       ctx.strokeStyle = '#00f5d4';
       ctx.lineWidth = 3.5;
       ctx.shadowColor = '#00f5d4';
-      ctx.shadowBlur = 16;
+      ctx.shadowBlur = 18;
       ctx.stroke();
 
       // 안쪽 에메랄드 코어
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, 8, 0, Math.PI * 2);
+      ctx.arc(pt.x, pt.y, 9, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = '#00f2fe';
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = 14;
       ctx.fill();
 
       ctx.restore();
