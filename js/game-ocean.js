@@ -384,13 +384,13 @@ export class OceanGameEngine {
     const robotChance = config.robotChance !== undefined ? config.robotChance : (config.oilChance || 0);
 
     if (rand < robotChance) {
-      // 🤖 바다를 스스로 정화 중인 바다청소로봇 (🚨 빨간색 주의 비누방울: 건드리면 고장!)
+      // 🤖 바다를 스스로 정화 중인 바다청소로봇 (🚨 순수 빨간색 주의 비누방울: 건드리면 고장!)
       type = 'ROBOT';
       label = '청소로봇 🤖';
       icon = '🤖';
       points = 0;
       baseDamage = 25; // 건드리면 고장나며 청정도 -25% 대폭 하락
-      color = '#ff3344'; // 🚨 건드리면 안 되는 주의 장애물: 선명한 빨간색 네온 비누방울
+      color = '#ff0033'; // 🚨 건드리면 안 되는 주의 장애물: 순수한 새빨간색(#ff0033) 비누방울
       baseRadius = 95;   // 북극 폭탄과 동일한 기본 반경
     } else if (rand < robotChance + config.oxygenChance) {
       // 🫧 산소 방울 회복 아이템
@@ -771,66 +771,133 @@ export class OceanGameEngine {
 
     ctx.save();
 
-    // 1. 방울 외곽 발광 효과 (로봇 방울은 빨간색 네온 글로우를 더욱 강렬하게!)
-    ctx.shadowColor = obj.color;
-    ctx.shadowBlur = obj.type === 'ROBOT' ? 28 : 20;
+    if (obj.type === 'ROBOT') {
+      // ----------------------------------------------------------------------
+      // 🚨 [바다청소로봇 전용] 주황색 느낌 없는 순수한 3D 새빨간색(#ff0033) 비누방울
+      // ----------------------------------------------------------------------
+      // 1. 강렬한 붉은 네온 외곽 발광
+      ctx.shadowColor = '#ff0033';
+      ctx.shadowBlur = 35;
 
-    // 2. 반투명 버블 구체 배경 (빨간색 로봇 방울은 내부도 붉은 입체 틴트)
-    const grad = ctx.createRadialGradient(
-      obj.x - obj.radius * 0.3,
-      obj.y - obj.radius * 0.3,
-      obj.radius * 0.1,
-      obj.x,
-      obj.y,
-      obj.radius
-    );
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-    grad.addColorStop(0.35, obj.type === 'ROBOT' ? 'rgba(255, 51, 68, 0.65)' : `${obj.color}66`);
-    grad.addColorStop(0.85, obj.type === 'ROBOT' ? 'rgba(255, 20, 50, 0.35)' : `${obj.color}22`);
-    grad.addColorStop(1, obj.type === 'ROBOT' ? 'rgba(230, 0, 40, 0.90)' : `${obj.color}99`);
+      // 2. 바다 배경에 묻히지 않는 진하고 선명한 3D 레드 버블 구체 그라데이션
+      const grad = ctx.createRadialGradient(
+        obj.x - obj.radius * 0.35,
+        obj.y - obj.radius * 0.35,
+        obj.radius * 0.08,
+        obj.x,
+        obj.y,
+        obj.radius
+      );
+      grad.addColorStop(0, '#ffffff');    // 왼쪽 위 하얀 반사광
+      grad.addColorStop(0.2, '#ff6677');  // 밝은 핑크레드 하이라이트
+      grad.addColorStop(0.55, '#ff0033'); // 중심부 리얼 레드
+      grad.addColorStop(0.85, '#cc0029'); // 진한 루비 레드
+      grad.addColorStop(1, '#88001a');    // 외곽 짙은 암적색 음영
 
-    ctx.beginPath();
-    ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+      ctx.fill();
 
-    // 3. 버블 테두리 선 (로봇 방울은 조금 더 두껍고 강렬한 빨간색)
-    ctx.strokeStyle = obj.type === 'ROBOT' ? '#ff1e38' : obj.color;
-    ctx.lineWidth = obj.type === 'ROBOT' ? 4.5 : 3.5;
-    ctx.stroke();
+      // 3. 선명한 빨간색 테두리 선
+      ctx.strokeStyle = '#ff0033';
+      ctx.lineWidth = 5.0;
+      ctx.stroke();
 
-    // 4. 버블 상단 하이라이트 광택
-    ctx.beginPath();
-    ctx.arc(obj.x - obj.radius * 0.35, obj.y - obj.radius * 0.35, obj.radius * 0.35, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.fill();
+      // 4. 버블 상단 하이라이트 반사광 호(Arc)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.lineWidth = 3.5;
+      ctx.shadowBlur = 0;
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.radius * 0.72, -Math.PI * 0.75, -Math.PI * 0.25);
+      ctx.stroke();
 
-    // ------------------------------------------------------------------------
-    // 🌟 5. [거울 모드 텍스트 & 이모지 반전 보정 렌더링]
-    // 캔버스 전체가 CSS transform: scaleX(-1) 되어 있으므로,
-    // 방울 중심 좌표에서 scale(-1, 1)을 한 번 더 적용하여 글자가 똑바로 보이게 만듭니다!
-    // ------------------------------------------------------------------------
-    ctx.save();
-    ctx.translate(obj.x, obj.y);
-    if (isMirrored) {
-      ctx.scale(-1, 1);
+      // 5. [거울 모드 텍스트 반전 보정 & 라벨 렌더링]
+      ctx.save();
+      ctx.translate(obj.x, obj.y);
+      if (isMirrored) {
+        ctx.scale(-1, 1);
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // 중앙 큼직한 로봇 이모지
+      ctx.font = `${Math.round(obj.radius * 0.88)}px sans-serif`;
+      ctx.fillText(obj.icon, 0, -obj.radius * 0.15);
+
+      // 하단 텍스트 라벨 (진한 검붉은 외곽선과 흰색 글씨로 고대비)
+      ctx.font = `900 ${Math.round(obj.radius * 0.28)}px 'Noto Sans KR', sans-serif`;
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#4a000c';
+      ctx.lineWidth = 5.0;
+      ctx.strokeText(obj.label, 0, obj.radius * 0.52);
+      ctx.fillText(obj.label, 0, obj.radius * 0.52);
+
+      ctx.restore();
+    } else {
+      // ----------------------------------------------------------------------
+      // 🌊 [일반 쓰레기 & 산소 방울] 반투명 원형 버블 렌더링
+      // ----------------------------------------------------------------------
+      // 1. 방울 외곽 발광 효과
+      ctx.shadowColor = obj.color;
+      ctx.shadowBlur = 20;
+
+      // 2. 반투명 버블 구체 배경
+      const grad = ctx.createRadialGradient(
+        obj.x - obj.radius * 0.3,
+        obj.y - obj.radius * 0.3,
+        obj.radius * 0.1,
+        obj.x,
+        obj.y,
+        obj.radius
+      );
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+      grad.addColorStop(0.35, `${obj.color}66`);
+      grad.addColorStop(0.85, `${obj.color}22`);
+      grad.addColorStop(1, `${obj.color}99`);
+
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // 3. 버블 테두리 선
+      ctx.strokeStyle = obj.color;
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+
+      // 4. 버블 상단 하이라이트 광택
+      ctx.beginPath();
+      ctx.arc(obj.x - obj.radius * 0.35, obj.y - obj.radius * 0.35, obj.radius * 0.35, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.fill();
+
+      // 5. [거울 모드 텍스트 반전 보정 & 라벨 렌더링]
+      ctx.save();
+      ctx.translate(obj.x, obj.y);
+      if (isMirrored) {
+        ctx.scale(-1, 1);
+      }
+
+      ctx.shadowBlur = 0;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // (A) 중앙 큼직한 이모지 아이콘
+      ctx.font = `${Math.round(obj.radius * 0.88)}px sans-serif`;
+      ctx.fillText(obj.icon, 0, -obj.radius * 0.15);
+
+      // (B) 하단 텍스트 라벨
+      ctx.font = `900 ${Math.round(obj.radius * 0.28)}px 'Noto Sans KR', sans-serif`;
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = 'rgba(2, 26, 54, 0.95)';
+      ctx.lineWidth = 4;
+      ctx.strokeText(obj.label, 0, obj.radius * 0.52);
+      ctx.fillText(obj.label, 0, obj.radius * 0.52);
+
+      ctx.restore();
     }
-
-    ctx.shadowBlur = 0;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // (A) 중앙 큼직한 이모지 아이콘 (1학년 맞춤형 대형 폰트)
-    ctx.font = `${Math.round(obj.radius * 0.88)}px sans-serif`;
-    ctx.fillText(obj.icon, 0, -obj.radius * 0.15);
-
-    // (B) 하단 텍스트 라벨 (선명한 한글 이름)
-    ctx.font = `900 ${Math.round(obj.radius * 0.28)}px 'Noto Sans KR', sans-serif`;
-    ctx.fillStyle = obj.type === 'ROBOT' ? '#ffebee' : '#ffffff';
-    ctx.strokeStyle = obj.type === 'ROBOT' ? '#7f0000' : 'rgba(2, 26, 54, 0.95)';
-    ctx.lineWidth = 4.5;
-    ctx.strokeText(obj.label, 0, obj.radius * 0.52);
-    ctx.fillText(obj.label, 0, obj.radius * 0.52);
 
     ctx.restore(); // 텍스트 역반전 복원
     ctx.restore(); // 방울 상태 복원

@@ -16,7 +16,7 @@
 import { CameraManager } from './camera.js';
 import { MotionTracker } from './motion.js';
 import { SoundEngine } from './audio.js';
-import { OceanGameEngine } from './game-ocean.js';
+import { OceanGameEngine } from './game-ocean.js?v=20260928_redrobot2';
 
 class OceanApp {
   constructor() {
