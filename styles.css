@@ -299,6 +299,34 @@ html, body {
   text-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
 }
 
+/* 🌊 푸른 바다 지킴이 게임으로 이동하는 테마 스위치 버튼 */
+.theme-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid var(--ice-cyan);
+  border-radius: 9999px;
+  color: var(--text-white);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--duration-fast);
+}
+
+.theme-switch-btn:hover {
+  background: var(--ice-cyan);
+  color: #031b33;
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.7);
+}
+
+.switch-icon {
+  font-size: 0.95rem;
+}
+
 /* 7-2. 중앙: 빙하 보존율 게이지 (Health Bar) */
 .glacier-status-container {
   flex: 1;

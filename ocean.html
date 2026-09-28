@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <!-- 모바일 기기(아이패드, 태블릿) 및 다양한 화면 해상도에서 비율을 올바르게 유지하기 위한 뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#021c35" />
+  <meta name="description" content="웹캠 동작 인식 기술을 활용한 교육용 푸른 바다 지킴이 (바다쓰레기 수거) 인터랙션 게임입니다." />
+  <title>푸른 바다 지킴이 (Ocean Trash Cleaner) - 웹캠 모션 인터랙션</title>
+
+  <!-- 웹폰트: 가독성이 뛰어난 Noto Sans KR과 미래지향적 네온 느낌의 Rajdhani 폰트 불러오기 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- 파비콘: 바다거북이 이모지 -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐢</text></svg>" />
+
+  <!-- 바다 전용 스타일시트 연결 -->
+  <link rel="stylesheet" href="styles-ocean.css" />
+</head>
+<body>
+  <!-- ==========================================================================
+       [전체 애플리케이션 컨테이너]
+       - mirror-active: 사용자가 거울을 보듯 화면을 볼 수 있도록 좌우 반전 기본 적용
+       - obs-mode: OBS 브라우저 소스 오버레이로 사용할 때 투명 배경으로 전환
+       - chromakey-mode: ATEM 스위처나 크로마키 환경을 위한 그린스크린 모드 전환
+       ========================================================================== -->
+  <div id="appContainer" class="app-container mirror-active">
+
+    <!-- ==========================================================================
+         [1. 무대 영역: 웹캠 비디오 및 바다쓰레기 인터랙션 게임 캔버스]
+         - 웹캠과 캔버스가 동일한 16:9 비율 공간에 완벽히 겹쳐지도록 배치됩니다.
+         ========================================================================== -->
+    <div id="stageContainer" class="stage-container">
+      <!-- 사용자 카메라 영상을 실시간으로 보여주는 웹캠 비디오 (음소거 필수, playsinline 필수) -->
+      <video id="webcam" autoplay playsinline muted></video>
+
+      <!-- 손동작 인식, 바닷속 물결, 떠다니는 해양 쓰레기, 정화 파티클이 그려질 메인 캔버스 -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- 바닷속 분위기 연출을 위한 시각 효과 레이어 (물방울 기포, 햇살 광선 등) -->
+      <div id="stageFxOverlay" class="stage-fx-overlay pointer-events-none"></div>
+    </div>
+
+    <!-- ==========================================================================
+         [2. UI 레이어: 상단 HUD, 하단 제어 툴바, 팝업 모달]
+         - 무대 위에 떠 있는 해양 글래스모피즘(반투명 에메랄드 유리) 인터페이스 레이어입니다.
+         ========================================================================== -->
+    <div class="ui-layer">
+
+      <!-- ------------------------------------------------------------------------
+           [2-1. 상단 HUD (헤드업 디스플레이)]
+           - 1학년 어린이들이 멀리서도 한눈에 알아볼 수 있는 큼직하고 시원한 네온 카드
+           ------------------------------------------------------------------------ -->
+      <header class="hud-top">
+        <!-- 좌측: 타이틀 및 로고 영역 + 테마 전환 링크 -->
+        <div class="brand-group">
+          <div class="brand-icon-wrapper">
+            <span class="brand-icon">🌊</span>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">푸른 바다 지킴이</h1>
+            <span class="brand-badge">바다쓰레기 수거 대모험</span>
+          </div>
+          <!-- 🧊 북극 빙하 지킴이로 이동할 수 있는 편리한 테마 전환 버튼 -->
+          <a href="index.html" class="theme-switch-btn" title="북극 빙하 지킴이 게임으로 이동합니다.">
+            <span class="switch-icon">🧊</span>
+            <span class="switch-text">북극 게임 가기</span>
+          </a>
+        </div>
+
+        <!-- 🌟 5단계 난이도 레벨 표시 배지 카드 -->
+        <div id="levelCard" class="hud-card metric-card level-card" title="현재 도전 중인 난이도 단계입니다.">
+          <div class="metric-icon">⭐</div>
+          <div class="metric-data">
+            <span class="metric-label">도전 단계</span>
+            <div class="level-value-box">
+              <span id="levelDisplay" class="digital-number level-number">1단계</span>
+              <span id="levelSubTitle" class="unit-text level-name">새싹 바다 수호자 🐣</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 중앙: 바다 청정도 & 생태계 건강도 게이지 -->
+        <div class="hud-card ocean-status-container" title="바다의 깨끗한 정도예요. 쓰레기를 쏙쏙 수거해 거북이와 물고기들의 집을 지켜주세요!">
+          <div class="ocean-icon-box">
+            <span id="turtleStatusIcon" class="ocean-hero-icon" aria-label="바다거북 미니 아이콘">🐢</span>
+          </div>
+          <div class="ocean-gauge-info">
+            <div class="ocean-gauge-header">
+              <span class="gauge-label">바다 청정도</span>
+              <span id="oceanHealthText" class="gauge-value">100%</span>
+            </div>
+            <!-- 실제 게이지 트랙과 채움 바 -->
+            <div class="health-track">
+              <div id="oceanHealthBar" class="health-bar-fill" style="width: 100%;">
+                <div class="health-bar-glow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측: 남은 시간 타이머 및 수거한 쓰레기 무게(점수) 카드 -->
+        <div class="metrics-group">
+          <!-- 남은 시간 타이머 카드 -->
+          <div class="hud-card metric-card timer-card" title="남은 시간 동안 바다를 깨끗하게 청소해 주세요!">
+            <div class="metric-icon">⏳</div>
+            <div class="metric-data">
+              <span class="metric-label">남은 시간</span>
+              <div class="timer-value-box">
+                <span id="timerDisplay" class="digital-number">60</span>
+                <span class="unit-text">초</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 수거한 쓰레기 무게 점수 카드 -->
+          <div class="hud-card metric-card score-card" title="지금까지 수거하여 깨끗하게 정화한 해양 쓰레기의 양이에요.">
+            <div class="metric-icon">🗑️</div>
+            <div class="metric-data">
+              <span class="metric-label">수거한 쓰레기</span>
+              <div class="score-value-box">
+                <span id="trashScore" class="digital-number">0</span>
+                <span class="unit-text">kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ------------------------------------------------------------------------
+           [2-2. 중앙 알림 토스트 (칭찬 및 피드백 배너)]
+           - 1학년 어린이들에게 칭찬과 활력을 불어넣는 큼직한 메시지 배너
+           ------------------------------------------------------------------------ -->
+      <div id="notificationBanner" class="notification-banner hidden" role="alert">
+        <span id="notificationIcon" class="notification-icon">✨</span>
+        <span id="notificationText" class="notification-text">양손을 움직여 바다쓰레기를 건져내세요!</span>
+      </div>
+
+      <!-- ------------------------------------------------------------------------
+           [2-3. 하단 대형 해양 산호초 월드 & 3배 커진 거북이 히어로 & 아기 물고기 친구]
+           - 하단 왼쪽: 웅장한 대형 산호 바위섬 + 3배 커진 반응형 바다거북이 히어로
+           - 하단 오른쪽: 대형 산호 모래섬 + 귀여운 아기 물고기/돌고래 친구와 조개 장식
+           ------------------------------------------------------------------------ -->
+      <div id="oceanWorldContainer" class="ocean-world-container" aria-label="하단 바다 산호초 월드">
+
+        <!-- 🌟 [하단 왼쪽 대형 산호 바위섬 & 3배 커진 바다거북이 히어로] -->
+        <div id="bottomTurtleStage" class="ocean-stage ocean-stage-left" aria-label="좌측 대형 산호 바위섬과 3배 확대된 바다거북이">
+          <!-- 거북이 대화 말풍선 -->
+          <div id="seaTurtleSpeech" class="turtle-speech-bubble">
+            <span id="turtleSpeechText" class="speech-text">안녕 친구야! 바다쓰레기를 치워줘! 🐢🌊</span>
+            <div class="bubble-arrow"></div>
+          </div>
+
+          <!-- 3배 대형 바다거북이 메인 캐릭터 일러스트 (동작 및 감정 반응) -->
+          <div id="seaTurtleHero" class="sea-turtle-hero mood-happy" title="바다를 지키는 3배 커진 귀여운 바다거북이 친구입니다!">
+            <div class="turtle-character-wrapper">
+              <!-- 🌟 3배 커진 대형 바다거북이 그래픽 (약 180~200px 크기) -->
+              <div id="turtleAvatar" class="turtle-avatar">🐢</div>
+              <!-- 거북이 주변을 맴도는 감정 이펙트 (하트, 반짝이, 땀방울 등) -->
+              <div id="turtleMoodFx" class="turtle-mood-fx">💖</div>
+            </div>
+            <!-- 거북이가 딛고 서 있는 든든한 산호 바위 받침대 라벨 -->
+            <div class="turtle-base-pedestal">
+              <span class="pedestal-coral">🪸</span>
+              <span id="turtleMoodTitle" class="pedestal-title">행복한 바다거북</span>
+            </div>
+          </div>
+
+          <!-- 🪸 좌측 대형 입체 산호 바위섬 SVG 일러스트레이션 -->
+          <div class="ocean-cliff-graphic left-cliff" aria-hidden="true">
+            <svg viewBox="0 0 360 220" class="ocean-svg" preserveAspectRatio="none">
+              <defs>
+                <!-- 산호 모래 상단 하이라이트 그라데이션 -->
+                <linearGradient id="coralTopLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#70e000" />
+                  <stop offset="50%" stop-color="#38b000" />
+                  <stop offset="100%" stop-color="#007200" />
+                </linearGradient>
+                <!-- 해저 암초 바디 딥에메랄드 그라데이션 -->
+                <linearGradient id="coralBodyLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00b4d8" stop-opacity="0.95" />
+                  <stop offset="40%" stop-color="#0077b6" stop-opacity="0.9" />
+                  <stop offset="85%" stop-color="#03045e" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="#021c35" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 암초 그늘면 그라데이션 -->
+                <linearGradient id="coralShadowLeft" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#005f73" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#011425" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 아쿠아 네온 발광 필터 -->
+                <filter id="oceanGlowLeft" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="-2" stdDeviation="4" flood-color="#00f2fe" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+              <!-- 1. 뒷배경 해저 암초 봉우리 -->
+              <polygon points="10,220 50,80 120,45 180,95 240,65 310,120 350,220" fill="url(#coralShadowLeft)" opacity="0.75" />
+              <!-- 2. 메인 산호 바위 본체 -->
+              <polygon points="0,220 30,105 100,60 170,115 230,85 320,135 360,220" fill="url(#coralBodyLeft)" filter="url(#oceanGlowLeft)" />
+              <!-- 3. 해저 암초 입체 각진 면 (Facet) -->
+              <polygon points="100,60 170,115 135,220 60,220" fill="#0096c7" opacity="0.45" />
+              <polygon points="170,115 230,85 250,220 180,220" fill="#023e8a" opacity="0.6" />
+              <!-- 4. 해초 및 산호 윗면 잔디밭 (거북이가 쉬는 플랫폼) -->
+              <path d="M0,115 Q40,90 80,95 T150,85 T220,95 T290,115 T360,140 L360,165 Q290,140 210,125 T70,120 L0,140 Z" fill="url(#coralTopLeft)" />
+              <!-- 5. 산호 가지 및 기포 장식 라인 -->
+              <circle cx="80" cy="55" r="7" fill="#ff70a6" opacity="0.85" />
+              <circle cx="95" cy="40" r="10" fill="#ff9770" opacity="0.85" />
+              <circle cx="115" cy="50" r="8" fill="#ffd670" opacity="0.85" />
+              <polyline points="30,105 100,60 170,115 230,85 320,135" fill="none" stroke="#70e000" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+            </svg>
+            <div class="ocean-shimmer-sparkle sp1">🫧</div>
+            <div class="ocean-shimmer-sparkle sp2">🪸</div>
+          </div>
+        </div>
+
+        <!-- 🌟 [하단 오른쪽 대형 산호 모래섬 & 귀여운 아기 물고기 친구] -->
+        <div id="rightFishStage" class="ocean-stage ocean-stage-right" aria-label="우측 대형 산호 모래섬과 응원하는 물고기 친구">
+          <!-- 물고기 응원 말풍선 -->
+          <div class="turtle-speech-bubble fish-speech">
+            <span class="speech-text">힘내라 친구야! 바다를 지켜줘! 🐠🌊</span>
+            <div class="bubble-arrow"></div>
+          </div>
+
+          <!-- 아기 물고기 캐릭터와 진주 조개 -->
+          <div class="fish-friend-hero" title="거북이와 함께 깨끗한 바다를 응원하는 물고기 친구예요!">
+            <div class="fish-character-wrapper">
+              <!-- 아기 물고기 아바타 -->
+              <div class="fish-avatar">🐠</div>
+              <!-- 물고기 주변 기포 효과 -->
+              <div class="fish-mood-fx">🫧</div>
+            </div>
+            <!-- 물고기 산호 받침대 라벨 -->
+            <div class="turtle-base-pedestal fish-pedestal">
+              <span class="pedestal-coral">🦪</span>
+              <span class="pedestal-title">바다 지킴이 니모</span>
+            </div>
+          </div>
+
+          <!-- 🪸 우측 대형 입체 산호 모래섬 SVG 일러스트레이션 -->
+          <div class="ocean-cliff-graphic right-cliff" aria-hidden="true">
+            <svg viewBox="0 0 340 210" class="ocean-svg" preserveAspectRatio="none">
+              <defs>
+                <!-- 우측 산호 상단 오렌지/핑크 그라데이션 -->
+                <linearGradient id="coralTopRight" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ff70a6" />
+                  <stop offset="60%" stop-color="#ff9770" />
+                  <stop offset="100%" stop-color="#ffd670" />
+                </linearGradient>
+                <!-- 우측 해저 산호 바디 그라데이션 -->
+                <linearGradient id="coralBodyRight" x1="100%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.95" />
+                  <stop offset="45%" stop-color="#0077b6" stop-opacity="0.9" />
+                  <stop offset="85%" stop-color="#03045e" stop-opacity="0.95" />
+                  <stop offset="100%" stop-color="#021c35" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 우측 산호 그늘면 -->
+                <linearGradient id="coralShadowRight" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#005f73" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#011425" stop-opacity="0.98" />
+                </linearGradient>
+                <!-- 아쿠아 네온 필터 -->
+                <filter id="oceanGlowRight" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="-2" stdDeviation="4" flood-color="#00f2fe" flood-opacity="0.6"/>
+                </filter>
+              </defs>
+              <!-- 1. 뒷배경 암초 -->
+              <polygon points="0,210 40,110 110,70 190,95 270,55 330,105 340,210" fill="url(#coralShadowRight)" opacity="0.75" />
+              <!-- 2. 본체 산호 절벽 -->
+              <polygon points="0,210 20,130 100,80 160,120 240,65 310,100 340,210" fill="url(#coralBodyRight)" filter="url(#oceanGlowRight)" />
+              <!-- 3. 산호 입체 면 분할 -->
+              <polygon points="240,65 160,120 190,210 270,210" fill="#0096c7" opacity="0.5" />
+              <polygon points="160,120 100,80 80,210 140,210" fill="#023e8a" opacity="0.6" />
+              <!-- 4. 윗면 핑크빛 산호초 플랫폼 (물고기가 춤추는 무대) -->
+              <path d="M0,140 Q60,105 130,110 T220,85 T300,95 T340,120 L340,150 Q280,130 210,120 T100,130 L0,160 Z" fill="url(#coralTopRight)" />
+              <!-- 5. 산호 방울 장식 -->
+              <circle cx="230" cy="50" r="10" fill="#ff70a6" opacity="0.9" />
+              <circle cx="250" cy="40" r="12" fill="#ffd670" opacity="0.9" />
+              <circle cx="270" cy="55" r="8" fill="#e9ff70" opacity="0.9" />
+              <polyline points="20,130 100,80 160,120 240,65 310,100" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+            </svg>
+            <div class="ocean-shimmer-sparkle sp3">🫧</div>
+            <div class="ocean-shimmer-sparkle sp4">🐚</div>
+          </div>
+        </div>
+
+      </div> <!-- end #oceanWorldContainer -->
+
+      <!-- ------------------------------------------------------------------------
+           [2-4. 하단 제어 툴바]
+           - 5단계 난이도 선택, 카메라 선택, 거울 모드, 방송 모드, 게임 시작 버튼
+           ------------------------------------------------------------------------ -->
+      <footer class="toolbar-bottom">
+        <!-- 좌측: 난이도 단계 선택 및 카메라 선택 드롭다운 -->
+        <div class="control-group camera-select-group">
+          <!-- 🌟 5단계 난이도 선택 드롭다운 -->
+          <div class="select-wrapper level-select-wrapper" title="게임 난이도를 1단계부터 5단계까지 선택할 수 있습니다.">
+            <span class="select-icon">🎯</span>
+            <select id="levelSelect" class="styled-select level-select" aria-label="게임 난이도 단계 선택">
+              <option value="1" selected>⭐ 1단계: 새싹 바다 수호자 (아주 쉬움)</option>
+              <option value="2">⭐⭐ 2단계: 초보 바다 친구 (쉬움)</option>
+              <option value="3">⭐⭐⭐ 3단계: 푸른 파도 지킴이 (보통)</option>
+              <option value="4">⭐⭐⭐⭐ 4단계: 해양 생태 수호자 (어려움)</option>
+              <option value="5">⭐⭐⭐⭐⭐ 5단계: 지구 바다의 영웅 (스릴 만점!)</option>
+            </select>
+          </div>
+
+          <!-- 카메라 장치 선택 드롭다운 -->
+          <div class="select-wrapper">
+            <span class="select-icon">📷</span>
+            <select id="cameraSelect" class="styled-select" aria-label="입력 웹캠 선택">
+              <option value="">카메라 탐색 중...</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 중앙 및 우측: 기능 토글 버튼 그룹 -->
+        <div class="control-group button-actions-group">
+          <!-- 좌우 반전(거울 모드) 토글 버튼 -->
+          <button id="toggleMirrorBtn" class="btn btn-tool active" type="button" title="내 모습이 거울처럼 보이도록 좌우를 반전합니다.">
+            <span class="btn-icon">🪞</span>
+            <span class="btn-text">거울 모드</span>
+          </button>
+
+          <!-- OBS Studio 투명 브라우저 소스 모드 토글 버튼 -->
+          <button id="toggleObsBtn" class="btn btn-tool" type="button" title="OBS Studio 송출을 위해 웹캠 배경을 투명하게 만듭니다.">
+            <span class="btn-icon">🎬</span>
+            <span class="btn-text">OBS 투명</span>
+          </button>
+
+          <!-- 크로마키(그린스크린) 모드 토글 버튼 -->
+          <button id="toggleChromaBtn" class="btn btn-tool" type="button" title="ATEM 스위처나 크로마키 필터를 위한 단색 배경으로 변경합니다.">
+            <span class="btn-icon">🟩</span>
+            <span class="btn-text">크로마키</span>
+          </button>
+
+          <!-- 사운드 On/Off 토글 버튼 -->
+          <button id="toggleSoundBtn" class="btn btn-tool" type="button" title="효과음 및 배경 음악 켜기/끄기">
+            <span id="soundIcon" class="btn-icon">🔊</span>
+            <span id="soundText" class="btn-text">소리 켬</span>
+          </button>
+
+          <!-- 전체화면 토글 버튼 -->
+          <button id="toggleFullscreenBtn" class="btn btn-tool" type="button" title="교실 프로젝터나 대형 모니터 전체화면으로 전환합니다.">
+            <span class="btn-icon">⛶</span>
+            <span class="btn-text">전체화면</span>
+          </button>
+
+          <!-- 메인 게임 시작 / 일시정지 / 재도전 버튼 -->
+          <button id="gameStartBtn" class="btn btn-primary" type="button" title="바다쓰레기 수거 게임을 시작합니다.">
+            <span class="btn-icon">🚀</span>
+            <span id="gameStartText" class="btn-text">게임 시작!</span>
+          </button>
+        </div>
+      </footer>
+
+      <!-- ------------------------------------------------------------------------
+           [2-5. 시작 안내 / 조작법 도움말 카드 (초기 표시 또는 도움말 클릭 시 노출)]
+           ------------------------------------------------------------------------ -->
+      <div id="guideOverlay" class="guide-overlay">
+        <div class="guide-card">
+          <div class="guide-header">
+            <h3>✋ 손을 움직여 바다쓰레기를 건져내세요!</h3>
+            <button id="guideCloseBtn" class="guide-close-btn" type="button" aria-label="도움말 닫기">✕</button>
+          </div>
+          <div class="guide-body">
+            <div class="guide-step">
+              <div class="step-num">1</div>
+              <p>카메라 앞에서 <strong>양손을 자유롭게 움직여</strong> 바다에 떠다니는 플라스틱 컵, 페트병, 비닐을 터치해 수거하세요.</p>
+            </div>
+            <div class="step-num-divider"></div>
+            <div class="guide-step">
+              <div class="step-num">2</div>
+              <p>맑은 <strong>산소 방울(🫧)과 진주(🦪)</strong>를 만지면 바다 청정도가 회복되지만, <strong>검은 기름통(🛢️)</strong>은 절대 만지지 마세요!</p>
+            </div>
+            <div class="step-num-divider"></div>
+            <div class="guide-step">
+              <div class="step-num">3</div>
+              <p>제한 시간 <strong>60초 동안</strong> 바다 청정도가 0%가 되지 않도록 쓰레기를 수거하면 바다거북이를 구하고 승리합니다!</p>
+            </div>
+          </div>
+          <div class="guide-footer">
+            <p class="guide-tip">💡 TIP: 1학년 친구들도 쉽게 즐길 수 있도록 <strong>[1단계: 새싹 바다 수호자]</strong>부터 시작해 보세요!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------------------------------
+           [2-6. 게임 결과 모달 (성적표: 해양 생태계 수호자 인증서)]
+           - 게임 종료 시 나타나는 글래스모피즘 인증서 모달 창
+           ------------------------------------------------------------------------ -->
+      <div id="resultModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+          <!-- 모달 상단 엠블럼 -->
+          <div class="modal-emblem-box">
+            <div id="resultEmblem" class="modal-emblem">🌊</div>
+            <div id="resultRankBadge" class="modal-rank-badge">RANK S</div>
+          </div>
+
+          <!-- 모달 제목 & 부제목 -->
+          <div class="modal-header">
+            <h2 id="modalTitle" class="modal-title">해양 생태계 수호자 인증서</h2>
+            <p id="modalSubtitle" class="modal-subtitle">푸른 바다의 해양 쓰레기를 수거하여 바다 생물들을 훌륭하게 구했습니다!</p>
+          </div>
+
+          <!-- 성적표 세부 내역 -->
+          <div class="modal-stats-grid">
+            <!-- 최종 수거한 쓰레기 무게 -->
+            <div class="stat-box">
+              <span class="stat-title">수거한 바다쓰레기</span>
+              <div class="stat-value-group">
+                <span id="finalScore" class="stat-highlight">150</span>
+                <span class="stat-unit">kg</span>
+              </div>
+            </div>
+
+            <!-- 남은 바다 청정도 -->
+            <div class="stat-box">
+              <span class="stat-title">최종 바다 청정도</span>
+              <div class="stat-value-group">
+                <span id="finalHealth" class="stat-highlight">85</span>
+                <span class="stat-unit">%</span>
+              </div>
+            </div>
+
+            <!-- 바다거북이 상태 -->
+            <div class="stat-box">
+              <span class="stat-title">바다거북과 물고기 상태</span>
+              <div class="stat-value-group">
+                <span id="finalTurtleStatus" class="stat-text-status">신나게 헤엄치는 중 🐢🌊</span>
+              </div>
+            </div>
+
+            <!-- 환경 보호 칭호 -->
+            <div class="stat-box">
+              <span class="stat-title">수여 칭호</span>
+              <div class="stat-value-group">
+                <span id="finalTitle" class="stat-text-title">최고의 바다 수호신 🎖️</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 교육적 격려 메시지 -->
+          <div class="modal-message-box">
+            <p id="finalEducateMessage" class="modal-educate-message">
+              "여러분의 멋진 움직임으로 150kg의 해양 쓰레기를 수거하여 바다거북과 물고기들이 숨쉴 수 있는 맑은 바다가 되었습니다! 일상 속에서도 플라스틱 줄이기에 함께 동참해 주세요!"
+            </p>
+          </div>
+
+          <!-- 모달 액션 버튼 그룹 -->
+          <div class="modal-actions">
+            <button id="modalRestartBtn" class="btn btn-primary btn-large" type="button">
+              <span class="btn-icon">🔄</span>
+              <span class="btn-text">다시 도전하기</span>
+            </button>
+            <button id="modalCloseBtn" class="btn btn-secondary btn-large" type="button">
+              <span class="btn-text">결과 닫기</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- end .ui-layer -->
+  </div> <!-- end #appContainer -->
+
+  <!-- ==========================================================================
+       [JavaScript 모듈 연결]
+       - 바다쓰레기 수거 전용 통합 스크립트 연결
+       ========================================================================== -->
+  <script type="module" src="js/app-ocean.js"></script>
+</body>
+</html>

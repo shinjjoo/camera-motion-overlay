@@ -1,0 +1,1448 @@
+/* ==========================================================================
+   푸른 바다 지킴이 (Ocean Trash Cleaner) - 전용 스타일시트
+   - 테마: 딥블루(Deep Ocean) & 에메랄드 아쿠아 글래스모피즘
+   - 3배 대형 바다거북이 캐릭터 & 아기 물고기 친구 애니메이션
+   - 하단 좌우 대형 산호초 일러스트 및 해저 기포 효과
+   - 웹캠 거울 모드, OBS 투명 모드, 크로마키 그린스크린 완벽 지원
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   [1. CSS 변수 (디자인 시스템 토큰)]
+   - 바다의 깊이감과 청량감을 표현하는 블루/에메랄드/산호 컬러 팔레트
+   -------------------------------------------------------------------------- */
+:root {
+  /* 해양 배경 및 표면 색상 */
+  --ocean-deep: #021226;
+  --ocean-surface: #04244d;
+  --ocean-cyan: #00f2fe;
+  --ocean-aqua: #4facfe;
+  --ocean-emerald: #00f5d4;
+  --coral-pink: #ff70a6;
+  --coral-orange: #ff9770;
+  --coral-yellow: #ffd670;
+  --danger-red: #ff3366;
+
+  /* 텍스트 컬러 */
+  --text-white: #ffffff;
+  --text-dim: #a0c4e2;
+  --text-muted: #5e8bb0;
+
+  /* 글래스모피즘 (반투명 바다 유리 효과) */
+  --glass-bg: rgba(4, 36, 77, 0.72);
+  --glass-border: rgba(0, 242, 254, 0.35);
+  --glass-blur: blur(14px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 15, 35, 0.65);
+
+  /* 네온 발광 효과 */
+  --neon-glow-cyan: 0 0 15px rgba(0, 242, 254, 0.65);
+  --neon-glow-emerald: 0 0 18px rgba(0, 245, 212, 0.7);
+  --neon-glow-coral: 0 0 16px rgba(255, 112, 166, 0.7);
+
+  /* 폰트 패밀리 */
+  --font-base: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-digital: 'Rajdhani', 'Noto Sans KR', sans-serif;
+
+  /* 애니메이션 이징 */
+  --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.18s;
+  --duration-normal: 0.3s;
+}
+
+/* --------------------------------------------------------------------------
+   [2. 전역 리셋 & 기본 스타일]
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--ocean-deep);
+  color: var(--text-white);
+  font-family: var(--font-base);
+  user-select: none;
+}
+
+/* --------------------------------------------------------------------------
+   [3. 전체 앱 컨테이너 (.app-container)]
+   -------------------------------------------------------------------------- */
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 25%, #053b75 0%, #031e42 50%, #010f22 100%);
+}
+
+/* --------------------------------------------------------------------------
+   [4. 무대 영역: 웹캠 비디오 및 게임 캔버스]
+   -------------------------------------------------------------------------- */
+.stage-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#webcam {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transform-origin: center center;
+  transition: filter var(--duration-normal) var(--ease-smooth);
+}
+
+#gameCanvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+/* 바닷속 은은한 햇살 광선 및 물결 오버레이 */
+.stage-fx-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 242, 254, 0.12) 0%, transparent 70%);
+}
+
+/* --------------------------------------------------------------------------
+   [5. 특수 방송/카메라 모드]
+   - 거울 모드, OBS 투명 모드, 크로마키 그린스크린
+   -------------------------------------------------------------------------- */
+/* 5-1. 거울 모드 (기본 활성): 웹캠과 캔버스를 좌우 반전 */
+.app-container.mirror-active #webcam,
+.app-container.mirror-active #gameCanvas {
+  transform: scaleX(-1);
+}
+
+/* 5-2. OBS 방송용 투명 배경 모드 */
+.app-container.obs-mode {
+  background: transparent !important;
+}
+
+.app-container.obs-mode #webcam {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.app-container.obs-mode .stage-fx-overlay {
+  display: none !important;
+}
+
+/* 5-3. ATEM 스위처용 크로마키(그린스크린) 모드 */
+.app-container.chromakey-mode {
+  background: #00ff00 !important;
+}
+
+.app-container.chromakey-mode #webcam {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.app-container.chromakey-mode .stage-fx-overlay {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   [6. UI 레이어 (상단 HUD, 제어 툴바, 모달)]
+   -------------------------------------------------------------------------- */
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.hud-top,
+.toolbar-bottom,
+.notification-banner,
+.guide-card,
+.modal-card {
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   [7. 상단 헤더 HUD (헤드업 디스플레이)]
+   -------------------------------------------------------------------------- */
+.hud-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+/* 7-1. 로고 & 프로젝트 타이틀 + 북극 게임 전환 링크 */
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  box-shadow: var(--glass-shadow);
+  transition: transform var(--duration-fast), border-color var(--duration-fast);
+}
+
+.brand-group:hover {
+  border-color: var(--ocean-cyan);
+  box-shadow: var(--neon-glow-cyan);
+}
+
+.brand-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(3, 30, 66, 0.8) 100%);
+  border: 1px solid var(--ocean-cyan);
+  border-radius: 50%;
+  box-shadow: var(--neon-glow-cyan);
+}
+
+.brand-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 30%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ocean-emerald);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* 🧊 북극 게임으로 이동하는 테마 스위치 버튼 */
+.theme-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid var(--ocean-cyan);
+  border-radius: 9999px;
+  color: var(--text-white);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all var(--duration-fast);
+}
+
+.theme-switch-btn:hover {
+  background: var(--ocean-cyan);
+  color: var(--ocean-deep);
+  transform: translateY(-2px);
+  box-shadow: var(--neon-glow-cyan);
+}
+
+.switch-icon {
+  font-size: 0.95rem;
+}
+
+/* 7-2. 공통 HUD 카드 스타일 */
+.hud-card {
+  display: flex;
+  align-items: center;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  padding: 0.6rem 1.1rem;
+  transition: all var(--duration-fast);
+}
+
+/* 🌟 5단계 난이도 레벨 배지 카드 */
+.level-card {
+  border-color: #ffd700;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.45);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(3, 30, 66, 0.85) 100%);
+  gap: 0.7rem;
+}
+
+.metric-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.level-value-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.level-number {
+  color: #ffe600;
+  text-shadow: 0 0 10px rgba(255, 230, 0, 0.7);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.level-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff275;
+  white-space: nowrap;
+}
+
+/* 7-3. 중앙: 바다 청정도 게이지 컨테이너 */
+.ocean-status-container {
+  flex: 1;
+  max-width: 440px;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1.25rem;
+  border-color: rgba(0, 245, 212, 0.4);
+}
+
+.ocean-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: radial-gradient(circle, rgba(0, 245, 212, 0.25) 0%, rgba(3, 25, 55, 0.8) 80%);
+  border: 1.5px solid var(--ocean-emerald);
+  border-radius: 16px;
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.35);
+  animation: turtle-float 3s ease-in-out infinite;
+}
+
+.ocean-hero-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+@keyframes turtle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.ocean-gauge-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ocean-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.gauge-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.gauge-value {
+  font-family: var(--font-digital);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ocean-emerald);
+  text-shadow: 0 0 10px rgba(0, 245, 212, 0.7);
+  transition: color var(--duration-fast);
+}
+
+/* 게이지 트랙 (바탕) */
+.health-track {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 실제 차오르는 체력 바 (Fill) */
+.health-bar-fill {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #00f2fe 0%, #00f5d4 100%);
+  border-radius: 9999px;
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.8);
+  transition: width 0.4s var(--ease-smooth), background 0.4s ease;
+}
+
+.health-bar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2.2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 바다 오염 위험 경고 스타일 */
+.ocean-status-container.danger {
+  border-color: var(--danger-red);
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.7);
+  animation: pulse-danger 1.2s infinite ease-in-out;
+}
+
+.ocean-status-container.danger .health-bar-fill {
+  background: linear-gradient(90deg, #ff3366 0%, #ff70a6 100%);
+  box-shadow: 0 0 14px rgba(255, 51, 102, 0.9);
+}
+
+.ocean-status-container.danger .gauge-value {
+  color: var(--danger-red);
+  text-shadow: 0 0 10px rgba(255, 51, 102, 0.8);
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+    border-color: rgba(255, 51, 102, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 51, 102, 0.85);
+    border-color: rgba(255, 51, 102, 1);
+  }
+}
+
+/* 7-4. 우측: 타이머 & 점수판 그룹 */
+.metrics-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.metric-card {
+  gap: 0.65rem;
+  min-width: 120px;
+}
+
+.metric-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.timer-value-box,
+.score-value-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+.digital-number {
+  font-family: var(--font-digital);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.timer-card .digital-number {
+  color: #ffcc00;
+  text-shadow: 0 0 10px rgba(255, 204, 0, 0.6);
+}
+
+.score-card .digital-number {
+  color: var(--ocean-emerald);
+  text-shadow: 0 0 10px rgba(0, 245, 212, 0.7);
+}
+
+.unit-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+/* --------------------------------------------------------------------------
+   [8. 중앙 알림 토스트 (칭찬 및 피드백 배너)]
+   -------------------------------------------------------------------------- */
+.notification-banner {
+  position: absolute;
+  top: 6.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.5rem;
+  background: rgba(3, 28, 60, 0.88);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--ocean-emerald);
+  border-radius: 9999px;
+  box-shadow: var(--neon-glow-emerald);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-white);
+  z-index: 50;
+  transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.notification-banner.hidden {
+  opacity: 0;
+  transform: translate(-50%, -10px) scale(0.95);
+  pointer-events: none;
+}
+
+.notification-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   [9. 하단 대형 해양 산호초 월드 전체 컨테이너 (.ocean-world-container)]
+   -------------------------------------------------------------------------- */
+.ocean-world-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* 좌/우 해양 무대 공통 스타일 */
+.ocean-stage {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+/* 좌측 대형 산호 바위섬 무대: 3배 대형 바다거북이 장소 */
+.ocean-stage-left {
+  bottom: 4.8rem;
+  left: 1.5rem;
+  animation: ocean-bob-left 4.8s ease-in-out infinite;
+}
+
+.ocean-stage-left:hover {
+  transform: scale(1.03) translateY(-4px);
+}
+
+/* 우측 대형 산호 모래섬 무대: 귀여운 아기 물고기 친구 장소 */
+.ocean-stage-right {
+  bottom: 4.8rem;
+  right: 1.5rem;
+  animation: ocean-bob-right 5.2s ease-in-out infinite;
+}
+
+.ocean-stage-right:hover {
+  transform: scale(1.03) translateY(-4px);
+}
+
+@keyframes ocean-bob-left {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes ocean-bob-right {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-9px) rotate(-1deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   [10. 대화 말풍선 공통 스타일 (.turtle-speech-bubble)]
+   -------------------------------------------------------------------------- */
+.turtle-speech-bubble {
+  position: relative;
+  background: #ffffff;
+  color: #021a36;
+  padding: 0.75rem 1.3rem;
+  border-radius: 24px;
+  font-family: var(--font-base);
+  font-size: 1.05rem;
+  font-weight: 800;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(0, 245, 212, 0.55);
+  margin-bottom: 0.8rem;
+  white-space: nowrap;
+  animation: speech-bounce 2.6s infinite ease-in-out;
+  border: 3px solid var(--ocean-emerald);
+  z-index: 10;
+}
+
+.fish-speech {
+  border-color: #ffd670;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 18px rgba(255, 214, 112, 0.55);
+  animation: speech-bounce 3s infinite ease-in-out;
+  font-size: 0.95rem;
+}
+
+.bubble-arrow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #ffffff;
+}
+
+@keyframes speech-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* --------------------------------------------------------------------------
+   [11. 🌟 3배 커진 대형 바다거북이 메인 히어로]
+   -------------------------------------------------------------------------- */
+.sea-turtle-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.45));
+  z-index: 5;
+}
+
+.turtle-character-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🌟 거북이 아바타 크기: 11.5rem (약 184px, 3배 초대형!) */
+.turtle-avatar {
+  font-size: 11.5rem;
+  line-height: 1;
+  user-select: none;
+  transition: transform 0.3s var(--ease-bounce);
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+}
+
+/* 거북이 주변 대형 감정 이펙트 */
+.turtle-mood-fx {
+  position: absolute;
+  top: -15px;
+  right: -25px;
+  font-size: 3.2rem;
+  animation: mood-fx-pop 1.8s infinite ease-in-out;
+}
+
+@keyframes mood-fx-pop {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.95; }
+  50% { transform: scale(1.35) rotate(18deg); opacity: 1; }
+}
+
+/* 거북이가 서 있는 산호 바위 받침대 */
+.turtle-base-pedestal {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: -0.5rem;
+  background: rgba(3, 25, 55, 0.92);
+  border: 1.5px solid var(--ocean-emerald);
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  box-shadow: 0 0 14px rgba(0, 245, 212, 0.5);
+  z-index: 6;
+}
+
+.pedestal-coral {
+  font-size: 1.15rem;
+}
+
+.pedestal-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--ocean-emerald);
+  letter-spacing: 0.02em;
+}
+
+/* --------------------------------------------------------------------------
+   [12. 🐠 우측 대형 산호 모래섬의 아기 물고기 친구]
+   -------------------------------------------------------------------------- */
+.fish-friend-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.4));
+  z-index: 5;
+}
+
+.fish-character-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fish-avatar {
+  font-size: 5.5rem;
+  line-height: 1;
+  user-select: none;
+  animation: fish-swim 2.4s infinite ease-in-out;
+}
+
+/* 물고기 살랑살랑 수영 모션 */
+@keyframes fish-swim {
+  0%, 100% {
+    transform: rotate(-8deg) translateY(0);
+  }
+  50% {
+    transform: rotate(8deg) translateY(-10px);
+  }
+}
+
+.fish-mood-fx {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  font-size: 2rem;
+  animation: sparkle-twinkle 1.6s infinite ease-in-out;
+}
+
+.fish-pedestal {
+  border-color: #ffd670;
+  box-shadow: 0 0 14px rgba(255, 214, 112, 0.45);
+}
+
+.fish-pedestal .pedestal-title {
+  color: #ffe600;
+}
+
+/* --------------------------------------------------------------------------
+   [13. 🪸 웅장한 입체 산호 바위섬 SVG 그래픽]
+   -------------------------------------------------------------------------- */
+.ocean-cliff-graphic {
+  position: absolute;
+  bottom: -4rem;
+  width: 380px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 12px 25px rgba(0, 0, 0, 0.6));
+}
+
+.ocean-cliff-graphic.left-cliff {
+  left: -20px;
+}
+
+.ocean-cliff-graphic.right-cliff {
+  right: -20px;
+  width: 350px;
+  height: 210px;
+}
+
+.ocean-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 산호 표면의 반짝이는 기포와 조개 */
+.ocean-shimmer-sparkle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  animation: sparkle-twinkle 2.5s infinite ease-in-out;
+}
+
+.ocean-shimmer-sparkle.sp1 {
+  top: 45px;
+  left: 80px;
+  font-size: 1.4rem;
+  animation-delay: 0.2s;
+}
+
+.ocean-shimmer-sparkle.sp2 {
+  top: 75px;
+  right: 60px;
+  font-size: 1.2rem;
+  animation-delay: 0.8s;
+}
+
+.ocean-shimmer-sparkle.sp3 {
+  top: 50px;
+  left: 60px;
+  font-size: 1.3rem;
+  animation-delay: 0.4s;
+}
+
+.ocean-shimmer-sparkle.sp4 {
+  top: 70px;
+  right: 70px;
+  font-size: 1.4rem;
+  animation-delay: 1.1s;
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3) rotate(20deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.9));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   [14. 바다거북이 5대 감정/상태별 애니메이션 키프레임]
+   1. 초신남 (Dancing Turtle): 지느러미 저으며 유영
+   2. 응원 (Cheering Turtle): 부드럽게 고개 끄덕이며 파이팅
+   3. 당황/깜짝 (Worried Turtle): 땀 흘리며 덜덜 떨림
+   4. 위기/울음 (Crying Turtle): 눈물 뚝뚝 흘리며 웅크림
+   5. 승리/슈퍼히어로 (Superhero Turtle): 황금빛 오라와 만세 유영
+   -------------------------------------------------------------------------- */
+
+/* 1. 초신남 댄싱 모드 */
+.sea-turtle-hero.mood-dancing .turtle-avatar {
+  animation: turtle-dance 0.75s infinite alternate ease-in-out;
+}
+
+@keyframes turtle-dance {
+  0% { transform: translateY(0) rotate(-10deg) scale(1.03); }
+  50% { transform: translateY(-24px) rotate(0deg) scale(1.12); }
+  100% { transform: translateY(0) rotate(10deg) scale(1.03); }
+}
+
+/* 2. 평상시 응원 모드 */
+.sea-turtle-hero.mood-cheering .turtle-avatar {
+  animation: turtle-cheer 1.5s infinite ease-in-out;
+}
+
+@keyframes turtle-cheer {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.05); }
+}
+
+/* 3. 당황/깜짝 모드 */
+.sea-turtle-hero.mood-worried .turtle-avatar {
+  animation: turtle-worry 0.28s infinite ease-in-out;
+}
+
+@keyframes turtle-worry {
+  0%, 100% { transform: translateX(-5px) rotate(-4deg); }
+  50% { transform: translateX(5px) rotate(4deg); }
+}
+
+/* 4. 위기/울음 모드 */
+.sea-turtle-hero.mood-crying .turtle-avatar {
+  animation: turtle-cry 0.95s infinite ease-in-out;
+}
+
+@keyframes turtle-cry {
+  0%, 100% { transform: scale(0.96) translateY(3px); }
+  50% { transform: scale(0.92) translateY(10px); }
+}
+
+/* 5. 승리/슈퍼히어로 모드 */
+.sea-turtle-hero.mood-superhero .turtle-avatar {
+  animation: turtle-superhero 0.85s infinite alternate ease-in-out;
+  filter: drop-shadow(0 0 24px #ffd700);
+}
+
+@keyframes turtle-superhero {
+  0% { transform: translateY(0) scale(1.08); }
+  100% { transform: translateY(-30px) scale(1.22); }
+}
+
+/* --------------------------------------------------------------------------
+   [15. 하단 제어 툴바]
+   -------------------------------------------------------------------------- */
+.toolbar-bottom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  width: auto;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0.65rem 1.4rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  box-shadow: var(--glass-shadow);
+  z-index: 40;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* 드롭다운 스타일 */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-icon {
+  position: absolute;
+  left: 0.85rem;
+  font-size: 1rem;
+  color: var(--ocean-emerald);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.styled-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(3, 25, 55, 0.9);
+  color: var(--text-white);
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.65rem 2.25rem 0.65rem 2.4rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 9999px;
+  outline: none;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300f5d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+}
+
+.styled-select:hover,
+.styled-select:focus {
+  border-color: var(--ocean-emerald);
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.4);
+}
+
+.styled-select option {
+  background-color: var(--ocean-deep);
+  color: var(--text-white);
+}
+
+/* 5단계 난이도 드롭다운 */
+.level-select-wrapper {
+  border-color: rgba(255, 215, 0, 0.5);
+}
+
+.level-select {
+  background: rgba(4, 30, 65, 0.95);
+  color: #ffe600;
+  font-weight: 700;
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+}
+
+.level-select:hover,
+.level-select:focus {
+  border-color: #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
+}
+
+/* 버튼 공통 스타일 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.15rem;
+  font-family: var(--font-base);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.btn-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* 보조 도구 버튼 (.btn-tool) */
+.btn-tool {
+  background: rgba(3, 28, 60, 0.7);
+  color: var(--text-dim);
+  border-color: rgba(0, 242, 254, 0.25);
+}
+
+.btn-tool:hover {
+  background: rgba(0, 242, 254, 0.15);
+  color: var(--text-white);
+  border-color: var(--ocean-cyan);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-tool.active {
+  background: rgba(0, 245, 212, 0.22);
+  color: var(--ocean-emerald);
+  border-color: var(--ocean-emerald);
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.5);
+}
+
+/* 메인 액션 버튼 (.btn-primary) */
+.btn-primary {
+  background: linear-gradient(135deg, #00f2fe 0%, #00f5d4 100%);
+  color: #021a36;
+  font-weight: 800;
+  box-shadow: 0 0 18px rgba(0, 245, 212, 0.6);
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 24px rgba(0, 245, 212, 0.85);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* --------------------------------------------------------------------------
+   [16. 시작 안내 / 조작법 도움말 카드]
+   -------------------------------------------------------------------------- */
+.guide-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 15, 34, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.guide-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.guide-card {
+  width: 90%;
+  max-width: 600px;
+  background: rgba(3, 28, 62, 0.95);
+  border: 1.5px solid var(--ocean-emerald);
+  border-radius: 28px;
+  box-shadow: var(--neon-glow-emerald), 0 20px 50px rgba(0, 0, 0, 0.7);
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guide-header h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-white);
+}
+
+.guide-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50%;
+  transition: all var(--duration-fast);
+}
+
+.guide-close-btn:hover {
+  color: var(--text-white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.guide-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.guide-step {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: var(--ocean-emerald);
+  color: #021a36;
+  font-weight: 900;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.guide-step p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #e2f1fc;
+}
+
+.step-num-divider {
+  width: 2px;
+  height: 12px;
+  background: rgba(0, 245, 212, 0.3);
+  margin-left: 0.95rem;
+}
+
+.guide-footer {
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.guide-tip {
+  font-size: 0.85rem;
+  color: var(--ocean-cyan);
+}
+
+/* --------------------------------------------------------------------------
+   [17. 게임 결과 모달 (해양 생태계 수호자 인증서)]
+   -------------------------------------------------------------------------- */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 12, 28, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 150;
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+
+.modal-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.modal-card {
+  width: 90%;
+  max-width: 580px;
+  background: linear-gradient(135deg, rgba(3, 30, 68, 0.95) 0%, rgba(2, 18, 42, 0.98) 100%);
+  border: 2px solid var(--ocean-emerald);
+  border-radius: 32px;
+  box-shadow: 0 0 35px rgba(0, 245, 212, 0.4), 0 25px 60px rgba(0, 0, 0, 0.8);
+  padding: 2.25rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.4rem;
+  animation: modal-pop 0.4s var(--ease-bounce);
+}
+
+@keyframes modal-pop {
+  0% { transform: scale(0.9) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-emblem-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  background: radial-gradient(circle, rgba(0, 245, 212, 0.3) 0%, rgba(3, 30, 68, 0.9) 100%);
+  border: 2px solid var(--ocean-emerald);
+  border-radius: 50%;
+  box-shadow: var(--neon-glow-emerald);
+}
+
+.modal-emblem {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.modal-rank-badge {
+  position: absolute;
+  bottom: -8px;
+  background: #ffd700;
+  color: #021a36;
+  font-size: 0.78rem;
+  font-weight: 900;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.modal-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--text-white);
+}
+
+.modal-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+}
+
+.modal-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.stat-box {
+  background: rgba(2, 18, 42, 0.7);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 18px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.stat-title {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+.stat-value-group {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.stat-highlight {
+  font-family: var(--font-digital);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ocean-emerald);
+}
+
+.stat-unit {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.stat-text-status,
+.stat-text-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffe600;
+}
+
+.modal-message-box {
+  background: rgba(0, 245, 212, 0.1);
+  border-left: 3px solid var(--ocean-emerald);
+  padding: 0.85rem 1.15rem;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.modal-educate-message {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #e2f7fc;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+.btn-large {
+  padding: 0.85rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   [18. 반응형 미디어 쿼리 (태블릿, 노트북, 모바일)]
+   -------------------------------------------------------------------------- */
+@media (max-width: 1280px) {
+  .ocean-stage-left {
+    transform: scale(0.85);
+    transform-origin: bottom left;
+    left: 0.5rem;
+    bottom: 4.8rem;
+  }
+
+  .ocean-stage-right {
+    transform: scale(0.85);
+    transform-origin: bottom right;
+    right: 0.5rem;
+    bottom: 4.8rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ocean-stage-left {
+    transform: scale(0.72);
+    transform-origin: bottom left;
+    left: 0.2rem;
+    bottom: 5.2rem;
+  }
+
+  .ocean-stage-right {
+    transform: scale(0.72);
+    transform-origin: bottom right;
+    right: 0.2rem;
+    bottom: 5.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .ocean-stage-left {
+    transform: scale(0.55);
+    transform-origin: bottom left;
+    left: 0;
+    bottom: 7.5rem;
+  }
+
+  .ocean-stage-right {
+    display: none;
+  }
+
+  .turtle-speech-bubble {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.9rem;
+  }
+}
+
+/* 대형 교실 프로젝터 및 4K 화면 (1920px 이상) */
+@media (min-width: 1920px) {
+  .ocean-stage-left {
+    bottom: 5.5rem;
+    left: 2rem;
+  }
+
+  .ocean-stage-right {
+    bottom: 5.5rem;
+    right: 2rem;
+  }
+
+  .turtle-avatar {
+    font-size: 14rem;
+  }
+
+  .fish-avatar {
+    font-size: 7rem;
+  }
+}

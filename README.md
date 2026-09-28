@@ -1,10 +1,21 @@
-# 🧊 북극 빙하 지킴이 (Arctic Ice Guardian)
-> **웹캠 AI 모션 인식 기반의 기후변화 & 탄소 감축 교육 인터랙션 웹 애플리케이션**  
-> "교실과 방송 스튜디오에서 손을 뻗어 북극곰의 빙하를 지켜주세요!"
+# 🌍 지구 환경 지킴이 시리즈 (Earth Guardians Series)
+> **웹캠 AI 모션 인식 기반의 기후변화 & 해양 생태계 교육 인터랙션 웹 애플리케이션**  
+> "교실과 방송 스튜디오에서 손을 뻗어 북극곰과 바다거북이를 지켜주세요!"
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Web](https://img.shields.io/badge/Platform-M2%20Mac%20%7C%20iPad%20%7C%20Windows%2011-cyan.svg)]()
-[![Hardware: OBS & ATEM](https://img.shields.io/badge/Broadcasting-OBS%20%7C%20ATEM%20Studio-green.svg)]()
+[![Broadcasting: OBS & ATEM](https://img.shields.io/badge/Broadcasting-OBS%20%7C%20ATEM%20Studio-green.svg)]()
+
+---
+
+## 🎮 2가지 테마 게임 바로가기
+
+1. **🧊 북극 빙하 지킴이 (`index.html`)**:
+   - 주제: 온실가스(CO₂, CH₄)를 막아 녹아내리는 빙하와 3배 대형 북극곰(`🐻‍❄️`), 펭귄(`🐧`) 친구 구출
+   - 접속: `https://shinjjoo.github.io/camera-motion-overlay/`
+2. **🌊 푸른 바다 지킴이 (`ocean.html`)**:
+   - 주제: 바다에 떠다니는 플라스틱 컵, 페트병, 비닐, 폐그물 수거 및 3배 대형 바다거북(`🐢`), 아기 물고기(`🐠`) 구출
+   - 접속: `https://shinjjoo.github.io/camera-motion-overlay/ocean.html`
 
 ---
 
@@ -15,11 +26,8 @@
 4. [게임 규칙 및 인터랙션 조작법](#4-게임-규칙-및-인터랙션-조작법)
 5. [단축키 & 제어 툴바 안내](#5-단축키--제어-툴바-안내)
 6. [교실 수업 & 빔프로젝터 대형 스크린 활용 팁](#6-교실-수업--빔프로젝터-대형-스크린-활용-팁)
-7. [전문 방송 장비 연동 가이드](#7-전문-방송-장비-연동-가이드)
-   - [OBS Studio 투명 오버레이 스트리밍](#7-1-obs-studio-브라우저-소스-투명-오버레이)
-   - [Blackmagic ATEM Television Studio HD 크로마키](#7-2-atem-television-studio-hd-크로마키-활용법)
-   - [Behringer X32 디지털 믹서 & Mac 오디오 라우팅](#7-3-behringer-x32-오디오-믹서-출력-설정)
-8. [폴더 및 코드 아키텍처 (교육자용 해설)](#8-폴더-및-코드-아키텍처-교육자용-해설)
+7. [전문 방송 장비 연동 가이드 (OBS & ATEM)](#7-전문-방송-장비-연동-가이드)
+8. [폴더 및 코드 아키텍처](#8-폴더-및-코드-아키텍처-교육자용-해설)
 9. [자주 묻는 질문 (FAQ) & 문제 해결](#9-자주-묻는-질문-faq--문제-해결)
 
 ---
